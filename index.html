@@ -419,22 +419,28 @@
       return row;
     }
 
-    async function fetchPrice(symbol) {
-      const targetUrl = `https://api.binance.me/api/v3/ticker/price?symbol=${encodeURIComponent(symbol)}`;
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+   async function fetchPrice(symbol) {
+  const url = `${SUPABASE_URL}/functions/v1/price?symbol=${encodeURIComponent(symbol)}`;
 
-      const res = await fetch(proxyUrl, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+  const res = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store'
+  });
 
-      const data = await res.json();
-      const price = Number(data.price);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status} - ${text}`);
+  }
 
-      if (!Number.isFinite(price)) {
-        throw new Error('Geçersiz fiyat');
-      }
+  const data = await res.json();
+  const price = Number(data.price);
 
-      return price;
-    }
+  if (!Number.isFinite(price)) {
+    throw new Error('Geçersiz fiyat');
+  }
+
+  return price;
+}
 
     async function loadRowsFromSupabase() {
       const { data, error } = await sb
