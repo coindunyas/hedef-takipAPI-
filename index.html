@@ -24,193 +24,89 @@
       background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
       color: var(--text);
     }
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 16px; }
     .card {
       background: rgba(17, 24, 39, 0.95);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      margin-bottom: 18px;
     }
-    h1 {
-      margin: 0 0 6px;
-      font-size: 24px;
-    }
-    .sub {
+    h1, h2 { margin: 0 0 8px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .sub, .note {
       color: var(--muted);
       font-size: 14px;
-      margin-bottom: 18px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
+    .sub { margin-bottom: 16px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 10px;
     }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label, .search-box label { font-size: 13px; color: var(--muted); }
+    .field input, .field select, .search-box input {
+      width: 100%; min-height: 42px; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--panel-2); color: var(--text); outline: none;
     }
-    .field label {
-      font-size: 13px;
-      color: var(--muted);
+    .actions, .toolbar, .search-row {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
     }
-    .field input, .field select {
-      width: 100%;
-      min-height: 42px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text);
-      outline: none;
-    }
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
+    .actions { margin-top: 14px; }
+    .toolbar, .search-row { margin-top: 14px; justify-content: space-between; }
+    .search-box { flex: 1 1 320px; display: flex; flex-direction: column; gap: 6px; }
     button {
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 14px;
-      font-weight: 700;
-      cursor: pointer;
-      color: white;
+      border: 0; border-radius: 10px; padding: 11px 14px; font-weight: 700; cursor: pointer; color: white;
     }
     .btn-primary { background: var(--blue); }
     .btn-secondary { background: #475569; }
     .btn-danger { background: var(--red); }
     .btn-success { background: var(--green); }
-    .toolbar {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .search-row {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .search-box {
-      flex: 1 1 320px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .search-box label {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .search-box input {
-      width: 100%;
-      min-height: 42px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text);
-      outline: none;
-    }
-    .stats {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-size: 14px;
-      color: var(--muted);
-    }
+    .btn-warning { background: var(--yellow); color: #111827; }
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
     .pill {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(51,65,85,.55);
-      border: 1px solid var(--border);
+      padding: 8px 12px; border-radius: 999px; background: rgba(51,65,85,.55); border: 1px solid var(--border);
     }
     .table-wrap {
-      overflow-x: auto;
-      margin-top: 16px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
+      overflow-x: auto; margin-top: 16px; border-radius: 16px; border: 1px solid var(--border);
     }
     table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1050px;
-      background: rgba(15, 23, 42, 0.9);
+      width: 100%; border-collapse: collapse; min-width: 1100px; background: rgba(15, 23, 42, 0.9);
     }
     th, td {
-      padding: 12px 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      font-size: 14px;
-      vertical-align: middle;
+      padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; vertical-align: middle;
     }
     th {
-      background: #0f172a;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      color: #cbd5e1;
+      background: #0f172a; position: sticky; top: 0; z-index: 1; color: #cbd5e1;
     }
     tr:hover td { background: rgba(30, 41, 59, .45); }
     .status {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
+      display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap;
     }
     .waiting { background: rgba(245, 158, 11, .2); color: #fbbf24; }
     .done-up { background: rgba(22, 163, 74, .2); color: #4ade80; }
     .done-down { background: rgba(220, 38, 38, .2); color: #f87171; }
     .error { background: rgba(148, 163, 184, .2); color: #cbd5e1; }
-    .row-up td.target-up { background: rgba(22, 163, 74, .22); }
-    .row-down td.target-down { background: rgba(220, 38, 38, .22); }
+    .hist-up { color: #4ade80; font-weight: 700; }
+    .hist-down { color: #f87171; font-weight: 700; }
     .muted { color: var(--muted); }
     .small { font-size: 12px; }
-    .cell-actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .cell-actions button {
-      padding: 8px 10px;
-      font-size: 12px;
-    }
-    .note {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
+    .cell-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cell-actions button { padding: 8px 10px; font-size: 12px; }
     .info-bar {
-      margin-bottom: 14px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(37, 99, 235, 0.15);
-      color: #dbeafe;
-      font-size: 14px;
+      margin-bottom: 14px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(37, 99, 235, 0.15); color: #dbeafe; font-size: 14px;
     }
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 560px) {
       .grid { grid-template-columns: 1fr; }
-      h1 { font-size: 20px; }
       .wrap { padding: 10px; }
       .card { padding: 12px; }
+      h1 { font-size: 20px; }
     }
   </style>
 </head>
@@ -219,7 +115,7 @@
     <div class="card">
       <h1>Hedef Takip - Binance TR</h1>
       <div class="sub">
-        Veriler artık Supabase üzerinde ortak tutulur. Aynı linki açan herkes aynı kayıtları görebilir. Coin adını istediğin gibi yazabilirsin; fiyat çekmek için ayrıca geçerli Binance TR sembolü girmen gerekir.
+        Veriler Supabase üzerinde ortak tutulur. Hedef gerçekleştiğinde aktif kayıt silinmez; alttaki geçmiş tablosuna yeni satır eklenir. Geçmiş, sen silene kadar kalır.
       </div>
 
       <div class="info-bar" id="connectionStatus">Bağlantı hazırlanıyor...</div>
@@ -228,11 +124,11 @@
         <div class="grid">
           <div class="field">
             <label>Coin Kodu</label>
-            <input id="coin" placeholder="Örn: STO" required />
+            <input id="coin" placeholder="Örn: THE" required />
           </div>
           <div class="field">
             <label>Binance TR Sembolü</label>
-            <input id="symbol" placeholder="Örn: BTCTRY" required />
+            <input id="symbol" placeholder="Örn: THETRY" required />
           </div>
           <div class="field">
             <label>Tarih</label>
@@ -240,11 +136,11 @@
           </div>
           <div class="field">
             <label>Aşağı Hedef</label>
-            <input id="downTarget" type="number" step="any" placeholder="Örn: 2.67" />
+            <input id="downTarget" type="number" step="any" placeholder="Örn: 4.00" />
           </div>
           <div class="field">
             <label>Yukarı Hedef</label>
-            <input id="upTarget" type="number" step="any" placeholder="Örn: 18" />
+            <input id="upTarget" type="number" step="any" placeholder="Örn: 4.50" />
           </div>
           <div class="field">
             <label>Not</label>
@@ -265,10 +161,11 @@
         <div class="actions">
           <button type="submit" class="btn-primary">Kaydı Ekle</button>
           <button type="button" id="refreshAllBtn" class="btn-success">Tüm Fiyatları Güncelle</button>
+          <button type="button" id="notifyBtn" class="btn-warning">Bildirim İzni Ver</button>
           <button type="button" id="exportBtn" class="btn-secondary">JSON Yedek Al</button>
           <button type="button" id="importBtn" class="btn-secondary">JSON Yükle</button>
           <input id="importFile" type="file" accept="application/json" style="display:none" />
-          <button type="button" id="clearBtn" class="btn-danger">Tüm Kayıtları Sil</button>
+          <button type="button" id="clearBtn" class="btn-danger">Tüm Aktif Kayıtları Sil</button>
         </div>
       </form>
 
@@ -276,15 +173,15 @@
         <div class="stats">
           <div class="pill">Toplam: <strong id="totalCount">0</strong></div>
           <div class="pill">Bekliyor: <strong id="waitingCount">0</strong></div>
-          <div class="pill">Aşağı Oldu: <strong id="downCount">0</strong></div>
-          <div class="pill">Yukarı Oldu: <strong id="upCount">0</strong></div>
+          <div class="pill">Aşağı Bölgesi: <strong id="downCount">0</strong></div>
+          <div class="pill">Yukarı Bölgesi: <strong id="upCount">0</strong></div>
         </div>
         <div class="muted small" id="lastRefreshText">Henüz güncellenmedi</div>
       </div>
 
       <div class="search-row">
         <div class="search-box">
-          <label>Kayıt Ara</label>
+          <label>Aktif Kayıt Ara</label>
           <input id="searchInput" placeholder="Coin, sembol, tarih, not veya durum ara" />
         </div>
         <button type="button" id="clearSearchBtn" class="btn-secondary">Aramayı Temizle</button>
@@ -302,7 +199,7 @@
               <th>Yukarı Hedef</th>
               <th>Anlık Fiyat</th>
               <th>Durum</th>
-              <th>Gerçekleşme Zamanı</th>
+              <th>Son Kontrol</th>
               <th>Not</th>
               <th>İşlem</th>
             </tr>
@@ -310,9 +207,45 @@
           <tbody id="tableBody"></tbody>
         </table>
       </div>
+    </div>
+
+    <div class="card">
+      <h2>Geçmiş Kayıtlar</h2>
+      <div class="sub">Hedef her gerçekleştiğinde buraya yeni satır düşer. Sen silene kadar kalır.</div>
+
+      <div class="actions">
+        <button type="button" id="clearHistoryBtn" class="btn-danger">Geçmişi Temizle</button>
+      </div>
+
+      <div class="search-row">
+        <div class="search-box">
+          <label>Geçmiş Ara</label>
+          <input id="historySearchInput" placeholder="Coin, sembol, olay tipi veya not ara" />
+        </div>
+        <button type="button" id="clearHistorySearchBtn" class="btn-secondary">Aramayı Temizle</button>
+        <div class="muted small" id="historySearchInfo">Tüm geçmiş kayıtları gösteriliyor</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Coin</th>
+              <th>Sembol</th>
+              <th>Olay</th>
+              <th>Hedef</th>
+              <th>Gerçekleşen Fiyat</th>
+              <th>Zaman</th>
+              <th>Not</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
 
       <div class="note">
-        İpucu: Bu sürüm Supabase ile ortak veri tutar. Geçerli sembol örneği: <strong>BTCTRY</strong>, <strong>ETHTRY</strong>. Kendi kısa kodunla işlem yapmak istiyorsan Coin alanına onu yaz, Sembol alanına ise Binance TR karşılığını yaz.
+        Geçerli sembol örnekleri: <strong>BTCTRY</strong>, <strong>ETHTRY</strong>, <strong>THETRY</strong>.
       </div>
     </div>
   </div>
@@ -324,10 +257,12 @@
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let rows = [];
+    let historyRows = [];
     let refreshTimer = null;
 
     const entryForm = document.getElementById('entryForm');
     const tableBody = document.getElementById('tableBody');
+    const historyTableBody = document.getElementById('historyTableBody');
     const totalCount = document.getElementById('totalCount');
     const waitingCount = document.getElementById('waitingCount');
     const downCount = document.getElementById('downCount');
@@ -342,7 +277,12 @@
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearchBtn');
     const searchInfo = document.getElementById('searchInfo');
+    const historySearchInput = document.getElementById('historySearchInput');
+    const clearHistorySearchBtn = document.getElementById('clearHistorySearchBtn');
+    const historySearchInfo = document.getElementById('historySearchInfo');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
     const connectionStatus = document.getElementById('connectionStatus');
+    const notifyBtn = document.getElementById('notifyBtn');
 
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);
     autoRefreshSeconds.value = localStorage.getItem('hedefTakipRefreshSeconds') || '10';
@@ -387,60 +327,74 @@
         .replace(/'/g, '&#039;');
     }
 
-    function evaluateRow(row) {
-      row.error = row.error || '';
-
-      if (row.price == null || !Number.isFinite(Number(row.price))) {
-        row.status = row.error ? 'error' : 'waiting';
-        row.statusText = row.error ? 'Fiyat alınamadı' : 'Bekliyor';
-        return row;
-      }
-
+    function getZone(row) {
       const price = Number(row.price);
       const hasDown = row.downTarget != null && Number.isFinite(Number(row.downTarget));
       const hasUp = row.upTarget != null && Number.isFinite(Number(row.upTarget));
 
-      if (hasDown && price <= Number(row.downTarget)) {
+      if (!Number.isFinite(price)) return 'waiting';
+      if (hasDown && price <= Number(row.downTarget)) return 'down';
+      if (hasUp && price >= Number(row.upTarget)) return 'up';
+      return 'waiting';
+    }
+
+    function applyVisualState(row) {
+      if (row.error) {
+        row.status = 'error';
+        row.statusText = 'Fiyat alınamadı';
+        return row;
+      }
+
+      const zone = row.currentZone || 'waiting';
+      if (zone === 'down') {
         row.status = 'done-down';
-        row.statusText = 'Aşağı hedef gerçekleşti';
-        row.hitTime = row.hitTime || new Date().toISOString();
-        return row;
-      }
-
-      if (hasUp && price >= Number(row.upTarget)) {
+        row.statusText = 'Aşağı hedef bölgesinde';
+      } else if (zone === 'up') {
         row.status = 'done-up';
-        row.statusText = 'Yukarı hedef gerçekleşti';
-        row.hitTime = row.hitTime || new Date().toISOString();
-        return row;
+        row.statusText = 'Yukarı hedef bölgesinde';
+      } else {
+        row.status = 'waiting';
+        row.statusText = 'Bekliyor';
       }
-
-      row.status = 'waiting';
-      row.statusText = 'Bekliyor';
       return row;
     }
 
-   async function fetchPrice(symbol) {
-  const url = `${SUPABASE_URL}/functions/v1/price?symbol=${encodeURIComponent(symbol)}`;
+    async function requestNotificationPermission() {
+      if (!('Notification' in window)) {
+        alert('Bu tarayıcı bildirim desteklemiyor.');
+        return false;
+      }
+      if (Notification.permission === 'granted') {
+        alert('Bildirim izni zaten verilmiş.');
+        return true;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        alert('Bildirim izni verildi.');
+        return true;
+      }
+      alert('Bildirim izni verilmedi.');
+      return false;
+    }
 
-  const res = await fetch(url, {
-    method: 'GET',
-    cache: 'no-store'
-  });
+    function showNotification(title, body) {
+      if (!('Notification' in window)) return;
+      if (Notification.permission !== 'granted') return;
+      new Notification(title, { body });
+    }
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`HTTP ${res.status} - ${text}`);
-  }
-
-  const data = await res.json();
-  const price = Number(data.price);
-
-  if (!Number.isFinite(price)) {
-    throw new Error('Geçersiz fiyat');
-  }
-
-  return price;
-}
+    async function fetchPrice(symbol) {
+      const url = `${SUPABASE_URL}/functions/v1/price?symbol=${encodeURIComponent(symbol)}`;
+      const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status} - ${text}`);
+      }
+      const data = await res.json();
+      const price = Number(data.price);
+      if (!Number.isFinite(price)) throw new Error('Geçersiz fiyat');
+      return price;
+    }
 
     async function loadRowsFromSupabase() {
       const { data, error } = await sb
@@ -448,29 +402,36 @@
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      rows = (data || []).map(item => ({
-        id: item.id,
-        coin: item.coin || '',
-        symbol: item.symbol || '',
-        date: item.date || '',
-        downTarget: item.lower_target,
-        upTarget: item.upper_target,
-        note: item.note || '',
-        price: null,
-        status: item.status || 'waiting',
-        statusText: item.status === 'done-up'
-          ? 'Yukarı hedef gerçekleşti'
-          : item.status === 'done-down'
-            ? 'Aşağı hedef gerçekleşti'
-            : 'Bekliyor',
-        hitTime: '',
-        updatedAt: '',
-        error: ''
-      }));
+      rows = (data || []).map(item => {
+        const row = {
+          id: item.id,
+          coin: item.coin || '',
+          symbol: item.symbol || '',
+          date: item.date || '',
+          downTarget: item.lower_target,
+          upTarget: item.upper_target,
+          note: item.note || '',
+          price: item.last_price,
+          updatedAt: item.last_checked_at,
+          currentZone: item.current_zone || 'waiting',
+          status: 'waiting',
+          statusText: 'Bekliyor',
+          error: ''
+        };
+        return applyVisualState(row);
+      });
+    }
+
+    async function loadHistoryFromSupabase() {
+      const { data, error } = await sb
+        .from('target_history')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      historyRows = data || [];
     }
 
     async function addRowToSupabase(row) {
@@ -481,10 +442,36 @@
         lower_target: row.downTarget,
         upper_target: row.upTarget,
         note: row.note,
-        status: 'waiting'
+        status: 'waiting',
+        current_zone: 'waiting'
       };
-
       const { error } = await sb.from('targets').insert([payload]);
+      if (error) throw error;
+    }
+
+    async function updateTargetState(id, price, zone) {
+      const payload = {
+        last_price: price,
+        last_checked_at: new Date().toISOString(),
+        current_zone: zone,
+        status: zone === 'up' ? 'done-up' : zone === 'down' ? 'done-down' : 'waiting'
+      };
+      const { error } = await sb.from('targets').update(payload).eq('id', id);
+      if (error) throw error;
+    }
+
+    async function insertHistory(row, triggerType, price) {
+      const targetValue = triggerType === 'down' ? row.downTarget : row.upTarget;
+      const payload = {
+        target_id: row.id,
+        coin: row.coin,
+        symbol: row.symbol,
+        trigger_type: triggerType,
+        target_value: targetValue,
+        price_at_trigger: price,
+        note: row.note || ''
+      };
+      const { error } = await sb.from('target_history').insert([payload]);
       if (error) throw error;
     }
 
@@ -493,15 +480,24 @@
       if (error) throw error;
     }
 
+    async function deleteHistoryRow(id) {
+      const { error } = await sb.from('target_history').delete().eq('id', id);
+      if (error) throw error;
+    }
+
     async function clearAllRowsFromSupabase() {
       const { error } = await sb.from('targets').delete().neq('id', '');
+      if (error) throw error;
+    }
+
+    async function clearAllHistoryFromSupabase() {
+      const { error } = await sb.from('target_history').delete().neq('id', '');
       if (error) throw error;
     }
 
     async function duplicateRowToSupabase(id) {
       const row = rows.find(r => r.id === id);
       if (!row) return;
-
       await addRowToSupabase({
         coin: row.coin,
         symbol: row.symbol,
@@ -514,68 +510,55 @@
 
     function matchesSearch(row, term) {
       if (!term) return true;
-      const haystack = [
-        row.coin,
-        row.symbol,
-        row.date,
-        row.note,
-        row.statusText,
-        row.error,
-        row.downTarget,
-        row.upTarget
-      ]
+      const haystack = [row.coin, row.symbol, row.date, row.note, row.statusText, row.downTarget, row.upTarget]
         .filter(v => v != null)
         .join(' ')
         .toLocaleLowerCase('tr-TR');
-
       return haystack.includes(term);
     }
 
-    function render() {
+    function matchesHistorySearch(row, term) {
+      if (!term) return true;
+      const triggerText = row.trigger_type === 'up' ? 'yukarı hedef' : 'aşağı hedef';
+      const haystack = [row.coin, row.symbol, row.note, row.target_value, row.price_at_trigger, triggerText]
+        .filter(v => v != null)
+        .join(' ')
+        .toLocaleLowerCase('tr-TR');
+      return haystack.includes(term);
+    }
+
+    function renderActive() {
       tableBody.innerHTML = '';
 
-      let waiting = 0;
-      let down = 0;
-      let up = 0;
-
+      let waiting = 0, down = 0, up = 0;
       const term = (searchInput.value || '').trim().toLocaleLowerCase('tr-TR');
       const filteredRows = rows.filter(row => matchesSearch(row, term));
 
       for (const row of rows) {
-        if (row.status === 'done-down') down++;
-        else if (row.status === 'done-up') up++;
+        if (row.currentZone === 'down') down++;
+        else if (row.currentZone === 'up') up++;
         else waiting++;
       }
 
       for (const row of filteredRows) {
+        const statusClass = row.status === 'done-up' ? 'done-up'
+          : row.status === 'done-down' ? 'done-down'
+          : row.status === 'error' ? 'error'
+          : 'waiting';
+
         const tr = document.createElement('tr');
-
-        if (row.status === 'done-down') tr.classList.add('row-down');
-        if (row.status === 'done-up') tr.classList.add('row-up');
-
-        const statusClass = row.status === 'done-up'
-          ? 'done-up'
-          : row.status === 'done-down'
-            ? 'done-down'
-            : row.status === 'error'
-              ? 'error'
-              : 'waiting';
-
         tr.innerHTML = `
-          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
-          <td>${escapeHtml(row.symbol || '')}</td>
-          <td>${escapeHtml(row.date || '')}</td>
-          <td class="target-down">${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
-          <td class="target-up">${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
+          <td><strong>${escapeHtml(row.coin)}</strong></td>
+          <td>${escapeHtml(row.symbol)}</td>
+          <td>${escapeHtml(row.date)}</td>
+          <td>${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
+          <td>${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
+          <td><strong>${formatPrice(row.price)}</strong></td>
           <td>
-            <div><strong>${formatPrice(row.price)}</strong></div>
-            <div class="small muted">${row.updatedAt ? formatDateTime(row.updatedAt) : '-'}</div>
-          </td>
-          <td>
-            <span class="status ${statusClass}">${escapeHtml(row.statusText || '')}</span>
+            <span class="status ${statusClass}">${escapeHtml(row.statusText)}</span>
             ${row.error ? `<div class="small muted" style="margin-top:6px">${escapeHtml(row.error)}</div>` : ''}
           </td>
-          <td>${formatDateTime(row.hitTime)}</td>
+          <td>${formatDateTime(row.updatedAt)}</td>
           <td>${escapeHtml(row.note || '-')}</td>
           <td>
             <div class="cell-actions">
@@ -585,7 +568,6 @@
             </div>
           </td>
         `;
-
         tableBody.appendChild(tr);
       }
 
@@ -593,42 +575,87 @@
       waitingCount.textContent = String(waiting);
       downCount.textContent = String(down);
       upCount.textContent = String(up);
-
-      if (!rows.length) {
-        searchInfo.textContent = 'Kayıt yok';
-      } else if (!term) {
-        searchInfo.textContent = 'Tüm kayıtlar gösteriliyor';
-      } else {
-        searchInfo.textContent = `${filteredRows.length} / ${rows.length} kayıt gösteriliyor`;
-      }
+      searchInfo.textContent = !rows.length ? 'Kayıt yok' : !term ? 'Tüm kayıtlar gösteriliyor' : `${filteredRows.length} / ${rows.length} kayıt gösteriliyor`;
 
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td colspan="10" class="muted" style="text-align:center; padding:18px 10px;">
-            Aramana uygun kayıt bulunamadı.
-          </td>
-        `;
+        tr.innerHTML = `<td colspan="10" class="muted" style="text-align:center; padding:18px 10px;">Aramana uygun kayıt bulunamadı.</td>`;
         tableBody.appendChild(tr);
+      }
+    }
+
+    function renderHistory() {
+      historyTableBody.innerHTML = '';
+      const term = (historySearchInput.value || '').trim().toLocaleLowerCase('tr-TR');
+      const filtered = historyRows.filter(row => matchesHistorySearch(row, term));
+
+      for (const row of filtered) {
+        const triggerText = row.trigger_type === 'up'
+          ? '<span class="hist-up">Yukarı hedef</span>'
+          : '<span class="hist-down">Aşağı hedef</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
+          <td>${escapeHtml(row.symbol || '')}</td>
+          <td>${triggerText}</td>
+          <td>${formatPrice(row.target_value)}</td>
+          <td>${formatPrice(row.price_at_trigger)}</td>
+          <td>${formatDateTime(row.created_at)}</td>
+          <td>${escapeHtml(row.note || '-')}</td>
+          <td><button class="btn-danger small" data-history-action="delete" data-id="${row.id}">Sil</button></td>
+        `;
+        historyTableBody.appendChild(tr);
+      }
+
+      historySearchInfo.textContent = !historyRows.length ? 'Geçmiş kayıt yok' : !term ? 'Tüm geçmiş kayıtları gösteriliyor' : `${filtered.length} / ${historyRows.length} geçmiş kaydı gösteriliyor`;
+
+      if (!filtered.length) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="8" class="muted" style="text-align:center; padding:18px 10px;">Aramana uygun geçmiş kaydı bulunamadı.</td>`;
+        historyTableBody.appendChild(tr);
+      }
+    }
+
+    function renderAll() {
+      renderActive();
+      renderHistory();
+    }
+
+    async function processRowRefresh(row) {
+      try {
+        row.error = '';
+        const previousZone = row.currentZone || 'waiting';
+        const price = await fetchPrice(row.symbol);
+        row.price = price;
+        row.updatedAt = new Date().toISOString();
+
+        const newZone = getZone(row);
+        row.currentZone = newZone;
+        applyVisualState(row);
+
+        await updateTargetState(row.id, price, newZone);
+
+        if ((newZone === 'up' || newZone === 'down') && previousZone !== newZone) {
+          await insertHistory(row, newZone, price);
+          await loadHistoryFromSupabase();
+
+          const title = `${row.coin} ${newZone === 'up' ? 'yukarı hedefe ulaştı' : 'aşağı hedefe indi'}`;
+          const body = `Sembol: ${row.symbol} | Hedef: ${formatPrice(newZone === 'up' ? row.upTarget : row.downTarget)} | Fiyat: ${formatPrice(price)}`;
+          showNotification(title, body);
+        }
+      } catch (err) {
+        row.error = err.message || 'Hata';
+        row.updatedAt = new Date().toISOString();
+        applyVisualState(row);
       }
     }
 
     async function refreshOne(id) {
       const row = rows.find(r => r.id === id);
       if (!row) return;
-
-      try {
-        row.error = '';
-        row.price = await fetchPrice(row.symbol);
-        row.updatedAt = new Date().toISOString();
-        evaluateRow(row);
-      } catch (err) {
-        row.error = err.message || 'Hata';
-        row.updatedAt = new Date().toISOString();
-        evaluateRow(row);
-      }
-
-      render();
+      await processRowRefresh(row);
+      renderAll();
     }
 
     async function refreshAll() {
@@ -637,35 +664,20 @@
         return;
       }
 
-      await Promise.all(rows.map(async (row) => {
-        try {
-          row.error = '';
-          row.price = await fetchPrice(row.symbol);
-          row.updatedAt = new Date().toISOString();
-          evaluateRow(row);
-        } catch (err) {
-          row.error = err.message || 'Hata';
-          row.updatedAt = new Date().toISOString();
-          evaluateRow(row);
-        }
-      }));
+      for (const row of rows) {
+        await processRowRefresh(row);
+      }
 
-      render();
+      renderAll();
       lastRefreshText.textContent = 'Son güncelleme: ' + new Date().toLocaleString('tr-TR');
     }
 
     function setupAutoRefresh() {
       const seconds = Number(getSavedRefreshSeconds());
       autoRefreshSeconds.value = String(seconds);
-
-      if (refreshTimer) {
-        clearInterval(refreshTimer);
-        refreshTimer = null;
-      }
-
-      if (seconds > 0) {
-        refreshTimer = setInterval(refreshAll, seconds * 1000);
-      }
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = null;
+      if (seconds > 0) refreshTimer = setInterval(refreshAll, seconds * 1000);
     }
 
     entryForm.addEventListener('submit', async (e) => {
@@ -682,28 +694,17 @@
         alert('Coin, sembol ve tarih gerekli.');
         return;
       }
-
       if (downTarget == null && upTarget == null) {
         alert('En az bir hedef girmen gerekiyor.');
         return;
       }
 
       try {
-        await addRowToSupabase({
-          coin,
-          symbol,
-          date,
-          downTarget,
-          upTarget,
-          note
-        });
-
+        await addRowToSupabase({ coin, symbol, date, downTarget, upTarget, note });
         entryForm.reset();
         document.getElementById('date').value = new Date().toISOString().slice(0, 10);
-        autoRefreshSeconds.value = getSavedRefreshSeconds();
-
         await loadRowsFromSupabase();
-        render();
+        renderAll();
         await refreshAll();
       } catch (err) {
         console.error(err);
@@ -712,32 +713,43 @@
     });
 
     refreshAllBtn.addEventListener('click', refreshAll);
+    notifyBtn.addEventListener('click', requestNotificationPermission);
 
     clearBtn.addEventListener('click', async () => {
-      if (!confirm('Tüm kayıtlar silinsin mi? Bu işlem geri alınmaz.')) return;
-
+      if (!confirm('Tüm aktif kayıtlar silinsin mi?')) return;
       try {
         await clearAllRowsFromSupabase();
         rows = [];
-        render();
+        renderAll();
       } catch (err) {
-        console.error(err);
-        alert('Kayıtlar silinemedi: ' + (err.message || 'Bilinmeyen hata'));
+        alert('Aktif kayıtlar silinemedi: ' + (err.message || 'Bilinmeyen hata'));
+      }
+    });
+
+    clearHistoryBtn.addEventListener('click', async () => {
+      if (!confirm('Tüm geçmiş kayıtları silmek istediğine emin misin?')) return;
+      try {
+        await clearAllHistoryFromSupabase();
+        historyRows = [];
+        renderAll();
+      } catch (err) {
+        alert('Geçmiş silinemedi: ' + (err.message || 'Bilinmeyen hata'));
       }
     });
 
     exportBtn.addEventListener('click', () => {
-      const exportRows = rows.map(row => ({
-        coin: row.coin,
-        symbol: row.symbol,
-        date: row.date,
-        lower_target: row.downTarget,
-        upper_target: row.upTarget,
-        note: row.note,
-        status: row.status
-      }));
-
-      const blob = new Blob([JSON.stringify(exportRows, null, 2)], { type: 'application/json' });
+      const payload = {
+        targets: rows.map(row => ({
+          coin: row.coin,
+          symbol: row.symbol,
+          date: row.date,
+          lower_target: row.downTarget,
+          upper_target: row.upTarget,
+          note: row.note
+        })),
+        history: historyRows
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -747,20 +759,14 @@
     });
 
     importBtn.addEventListener('click', () => importFile.click());
-
     importFile.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       try {
         const text = await file.text();
-        const data = JSON.parse(text);
-
-        if (!Array.isArray(data)) {
-          throw new Error('Geçersiz dosya');
-        }
-
-        for (const item of data) {
+        const parsed = JSON.parse(text);
+        const targets = Array.isArray(parsed) ? parsed : (parsed.targets || []);
+        for (const item of targets) {
           await addRowToSupabase({
             coin: String(item.coin || '').trim().toUpperCase(),
             symbol: normalizeSymbol(String(item.symbol || '').trim()),
@@ -770,12 +776,10 @@
             note: item.note || ''
           });
         }
-
         await loadRowsFromSupabase();
-        render();
+        renderAll();
         await refreshAll();
       } catch (err) {
-        console.error(err);
         alert('JSON yüklenemedi: ' + err.message);
       } finally {
         importFile.value = '';
@@ -787,59 +791,69 @@
       setupAutoRefresh();
     });
 
-    searchInput.addEventListener('input', render);
-
+    searchInput.addEventListener('input', renderActive);
     clearSearchBtn.addEventListener('click', () => {
       searchInput.value = '';
-      render();
-      searchInput.focus();
+      renderActive();
+    });
+
+    historySearchInput.addEventListener('input', renderHistory);
+    clearHistorySearchBtn.addEventListener('click', () => {
+      historySearchInput.value = '';
+      renderHistory();
     });
 
     tableBody.addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
-
       const id = btn.dataset.id;
       const action = btn.dataset.action;
-
       try {
         if (action === 'delete') {
           await deleteRowFromSupabase(id);
           await loadRowsFromSupabase();
-          render();
+          renderAll();
         }
-
         if (action === 'duplicate') {
           await duplicateRowToSupabase(id);
           await loadRowsFromSupabase();
-          render();
-          await refreshAll();
+          renderAll();
         }
-
         if (action === 'refresh') {
           await refreshOne(id);
         }
       } catch (err) {
-        console.error(err);
         alert('İşlem başarısız: ' + (err.message || 'Bilinmeyen hata'));
+      }
+    });
+
+    historyTableBody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const action = btn.dataset.historyAction;
+      try {
+        if (action === 'delete') {
+          await deleteHistoryRow(id);
+          await loadHistoryFromSupabase();
+          renderHistory();
+        }
+      } catch (err) {
+        alert('Geçmiş kaydı silinemedi: ' + (err.message || 'Bilinmeyen hata'));
       }
     });
 
     async function init() {
       try {
         connectionStatus.textContent = 'Bağlantı kontrol ediliyor...';
-
         const { error } = await sb.from('targets').select('id').limit(1);
         if (error) throw error;
-
         connectionStatus.textContent = 'Bağlantı başarılı. Veriler ortak listeden yükleniyor.';
         await loadRowsFromSupabase();
-        render();
+        await loadHistoryFromSupabase();
+        renderAll();
         setupAutoRefresh();
-
-        if (rows.length) {
-          await refreshAll();
-        }
+        if (rows.length) await refreshAll();
       } catch (err) {
         console.error(err);
         connectionStatus.textContent = 'Bağlantı hatası: ' + (err.message || 'Bilinmeyen hata');
