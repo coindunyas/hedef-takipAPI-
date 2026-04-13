@@ -204,12 +204,6 @@
       padding: 8px 10px;
       font-size: 12px;
     }
-    .note {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
     .section-head {
       display: flex;
       justify-content: space-between;
@@ -228,6 +222,24 @@
     }
     .badge-green { background: var(--green); }
     .badge-red { background: var(--red); }
+    .target-pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .target-pill-down {
+      background: rgba(220, 38, 38, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(220, 38, 38, 0.35);
+    }
+    .target-pill-up {
+      background: rgba(22, 163, 74, 0.2);
+      color: #4ade80;
+      border: 1px solid rgba(22, 163, 74, 0.35);
+    }
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -241,10 +253,50 @@
 </head>
 <body>
   <div class="wrap">
+
+    <!-- GECMIS USTTE -->
+    <div class="card">
+      <div class="section-head">
+        <h2>Geçmiş Kayıtlar</h2>
+        <div class="actions" style="margin-top:0">
+          <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-box">
+          <label>Geçmişte Ara</label>
+          <input id="historySearchInput" placeholder="Coin, sembol, tip, fiyat veya not ara" />
+        </div>
+        <button type="button" id="clearHistorySearchBtn" class="btn-secondary">Aramayı Temizle</button>
+        <div class="muted small" id="historySearchInfo">Tüm geçmiş kayıtlar gösteriliyor</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Coin</th>
+              <th>Sembol</th>
+              <th>Aşağı Hedef</th>
+              <th>Yukarı Hedef</th>
+              <th>Tetiklenen</th>
+              <th>Gerçekleşen Fiyat</th>
+              <th>Zaman</th>
+              <th>Not</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AKTIF KAYITLAR ALTTA -->
     <div class="card">
       <h1>Hedef Takip - Binance TR</h1>
       <div class="sub">
-        Veriler Supabase üzerinde ortak tutulur. Hedef gerçekleşince aktif kayıt silinmez, alttaki geçmiş tablosuna yeni satır eklenir. Aynı hedef yeniden tetiklenirse tekrar geçmiş kaydı oluşur.
+        Veriler Supabase üzerinde ortak tutulur. Hedef gerçekleşince aktif kayıt silinmez, üstteki geçmiş tablosuna yeni satır eklenir. Aynı hedef yeniden tetiklenirse tekrar geçmiş kaydı oluşur.
       </div>
 
       <div class="info-bar" id="connectionStatus">Bağlantı hazırlanıyor...</div>
@@ -335,43 +387,6 @@
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-head">
-        <h2>Geçmiş Kayıtlar</h2>
-        <div class="actions" style="margin-top:0">
-          <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
-        </div>
-      </div>
-
-      <div class="search-row">
-        <div class="search-box">
-          <label>Geçmişte Ara</label>
-          <input id="historySearchInput" placeholder="Coin, sembol, tip, fiyat veya not ara" />
-        </div>
-        <button type="button" id="clearHistorySearchBtn" class="btn-secondary">Aramayı Temizle</button>
-        <div class="muted small" id="historySearchInfo">Tüm geçmiş kayıtlar gösteriliyor</div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Coin</th>
-              <th>Sembol</th>
-              <th>Aşağı Hedef</th>
-              <th>Yukarı Hedef</th>
-              <th>Tetiklenen</th>
-              <th>Gerçekleşen Fiyat</th>
-              <th>Zaman</th>
-              <th>Not</th>
-              <th>İşlem</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -475,7 +490,6 @@
 
     async function sendTelegram(message) {
       const url = `${SUPABASE_URL}/functions/v1/telegram-send`;
-
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -528,10 +542,6 @@
       if (zone === 'up') return 'Yukarı bölgede';
       if (zone === 'down') return 'Aşağı bölgede';
       return 'Bekliyor';
-    }
-
-    function historyTypeText(type) {
-      return type === 'up' ? 'Yukarı hedef' : 'Aşağı hedef';
     }
 
     async function loadRowsFromSupabase() {
@@ -650,7 +660,6 @@
         row.coin,
         row.symbol,
         row.trigger_type,
-        historyTypeText(row.trigger_type),
         row.lower_target,
         row.upper_target,
         row.target_value,
@@ -663,6 +672,63 @@
         .toLocaleLowerCase('tr-TR');
 
       return haystack.includes(term);
+    }
+
+    function renderHistory() {
+      historyTableBody.innerHTML = '';
+
+      const term = (historySearchInput.value || '').trim().toLocaleLowerCase('tr-TR');
+      const filteredRows = historyRows.filter(row => matchesHistorySearch(row, term));
+
+      for (const row of filteredRows) {
+        const isDown = row.trigger_type === 'down';
+        const badgeText = isDown ? 'Aşağı Hedef' : 'Yukarı Hedef';
+        const badgeClass = isDown ? 'badge-red' : 'badge-green';
+
+        const lowerTargetHtml = row.lower_target == null
+          ? '-'
+          : `<span class="target-pill target-pill-down">${formatPrice(row.lower_target)}</span>`;
+
+        const upperTargetHtml = row.upper_target == null
+          ? '-'
+          : `<span class="target-pill target-pill-up">${formatPrice(row.upper_target)}</span>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
+          <td>${escapeHtml(row.symbol || '')}</td>
+          <td>${lowerTargetHtml}</td>
+          <td>${upperTargetHtml}</td>
+          <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+          <td>${formatPrice(row.price_at_trigger)}</td>
+          <td>${formatDateTime(row.created_at)}</td>
+          <td>${escapeHtml(row.note || '-')}</td>
+          <td>
+            <div class="cell-actions">
+              <button class="btn-danger" data-history-action="delete" data-id="${row.id}">Sil</button>
+            </div>
+          </td>
+        `;
+        historyTableBody.appendChild(tr);
+      }
+
+      if (!historyRows.length) {
+        historySearchInfo.textContent = 'Geçmiş kayıt yok';
+      } else if (!term) {
+        historySearchInfo.textContent = 'Tüm geçmiş kayıtlar gösteriliyor';
+      } else {
+        historySearchInfo.textContent = `${filteredRows.length} / ${historyRows.length} geçmiş kayıt gösteriliyor`;
+      }
+
+      if (!filteredRows.length) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="9" class="muted" style="text-align:center; padding:18px 10px;">
+            Aramana uygun geçmiş kayıt bulunamadı.
+          </td>
+        `;
+        historyTableBody.appendChild(tr);
+      }
     }
 
     function renderActive() {
@@ -744,58 +810,9 @@
       }
     }
 
-    function renderHistory() {
-      historyTableBody.innerHTML = '';
-
-      const term = (historySearchInput.value || '').trim().toLocaleLowerCase('tr-TR');
-      const filteredRows = historyRows.filter(row => matchesHistorySearch(row, term));
-
-      for (const row of filteredRows) {
-        const isDown = row.trigger_type === 'down';
-        const badgeClass = isDown ? 'badge-red' : 'badge-green';
-        const badgeText = isDown ? 'Aşağı Hedef' : 'Yukarı Hedef';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
-          <td>${escapeHtml(row.symbol || '')}</td>
-          <td>${row.lower_target == null ? '-' : formatPrice(row.lower_target)}</td>
-          <td>${row.upper_target == null ? '-' : formatPrice(row.upper_target)}</td>
-          <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-          <td>${formatPrice(row.price_at_trigger)}</td>
-          <td>${formatDateTime(row.created_at)}</td>
-          <td>${escapeHtml(row.note || '-')}</td>
-          <td>
-            <div class="cell-actions">
-              <button class="btn-danger" data-history-action="delete" data-id="${row.id}">Sil</button>
-            </div>
-          </td>
-        `;
-        historyTableBody.appendChild(tr);
-      }
-
-      if (!historyRows.length) {
-        historySearchInfo.textContent = 'Geçmiş kayıt yok';
-      } else if (!term) {
-        historySearchInfo.textContent = 'Tüm geçmiş kayıtlar gösteriliyor';
-      } else {
-        historySearchInfo.textContent = `${filteredRows.length} / ${historyRows.length} geçmiş kayıt gösteriliyor`;
-      }
-
-      if (!filteredRows.length) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td colspan="9" class="muted" style="text-align:center; padding:18px 10px;">
-            Aramana uygun geçmiş kayıt bulunamadı.
-          </td>
-        `;
-        historyTableBody.appendChild(tr);
-      }
-    }
-
     function renderAll() {
-      renderActive();
       renderHistory();
+      renderActive();
     }
 
     async function processRow(row) {
