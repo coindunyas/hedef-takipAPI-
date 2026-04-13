@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hedef Takip - Binance TR</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #334155;
+      --green: #16a34a;
+      --red: #dc2626;
+      --yellow: #f59e0b;
+      --blue: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .field input, .field select {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+    }
+    .btn-primary { background: var(--blue); }
+    .btn-secondary { background: #475569; }
+    .btn-danger { background: var(--red); }
+    .btn-success { background: var(--green); }
+    .toolbar {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-row {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1 1 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .search-box label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .search-box input {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(51,65,85,.55);
+      border: 1px solid var(--border);
+    }
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1050px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    th {
+      background: #0f172a;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      color: #cbd5e1;
+    }
+    tr:hover td { background: rgba(30, 41, 59, .45); }
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .waiting { background: rgba(245, 158, 11, .2); color: #fbbf24; }
+    .done-up { background: rgba(22, 163, 74, .2); color: #4ade80; }
+    .done-down { background: rgba(220, 38, 38, .2); color: #f87171; }
+    .error { background: rgba(148, 163, 184, .2); color: #cbd5e1; }
+    .row-up td.target-up { background: rgba(22, 163, 74, .22); }
+    .row-down td.target-down { background: rgba(220, 38, 38, .22); }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .cell-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .cell-actions button {
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .banner {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(37, 99, 235, .12);
+      color: #bfdbfe;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .hidden { display: none; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 20px; }
+      .wrap { padding: 10px; }
+      .card { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Hedef Takip - Binance TR</h1>
+      <div class="sub">
+        Veriler artık Supabase üzerinde ortak tutulur. Aynı linki açan herkes aynı kayıtları görebilir. Coin adını istediğin gibi yazabilirsin; fiyat çekmek için ayrıca geçerli Binance TR sembolü girmen gerekir.
+      </div>
+
+      <div id="statusBanner" class="banner">Bağlantı hazırlanıyor...</div>
+
+      <form id="entryForm">
+        <div class="grid">
+          <div class="field">
+            <label>Coin Kodu</label>
+            <input id="coin" placeholder="Örn: STO" required />
+          </div>
+          <div class="field">
+            <label>Binance TR Sembolü</label>
+            <input id="symbol" placeholder="Örn: BTCTRY" required />
+          </div>
+          <div class="field">
+            <label>Tarih</label>
+            <input id="date" type="date" required />
+          </div>
+          <div class="field">
+            <label>Aşağı Hedef</label>
+            <input id="downTarget" type="number" step="any" placeholder="Örn: 2.67" />
+          </div>
+          <div class="field">
+            <label>Yukarı Hedef</label>
+            <input id="upTarget" type="number" step="any" placeholder="Örn: 18" />
+          </div>
+          <div class="field">
+            <label>Not</label>
+            <input id="note" placeholder="İsteğe bağlı" />
+          </div>
+          <div class="field">
+            <label>Otomatik Yenile</label>
+            <select id="autoRefreshSeconds">
+              <option value="0">Kapalı</option>
+              <option value="5">5 sn</option>
+              <option value="10" selected>10 sn</option>
+              <option value="15">15 sn</option>
+              <option value="30">30 sn</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Kaydı Ekle</button>
+          <button type="button" id="refreshAllBtn" class="btn-success">Tüm Fiyatları Güncelle</button>
+          <button type="button" id="exportBtn" class="btn-secondary">JSON Yedek Al</button>
+          <button type="button" id="importBtn" class="btn-secondary">JSON Yükle</button>
+          <input id="importFile" type="file" accept="application/json" style="display:none" />
+          <button type="button" id="clearBtn" class="btn-danger">Tüm Kayıtları Sil</button>
+        </div>
+      </form>
+
+      <div class="toolbar">
+        <div class="stats">
+          <div class="pill">Toplam: <strong id="totalCount">0</strong></div>
+          <div class="pill">Bekliyor: <strong id="waitingCount">0</strong></div>
+          <div class="pill">Aşağı Oldu: <strong id="downCount">0</strong></div>
+          <div class="pill">Yukarı Oldu: <strong id="upCount">0</strong></div>
+        </div>
+        <div class="muted small" id="lastRefreshText">Henüz güncellenmedi</div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-box">
+          <label>Kayıt Ara</label>
+          <input id="searchInput" placeholder="Coin, sembol, tarih, not veya durum ara" />
+        </div>
+        <button type="button" id="clearSearchBtn" class="btn-secondary">Aramayı Temizle</button>
+        <div class="muted small" id="searchInfo">Tüm kayıtlar gösteriliyor</div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Coin</th>
+              <th>Sembol</th>
+              <th>Tarih</th>
+              <th>Aşağı Hedef</th>
+              <th>Yukarı Hedef</th>
+              <th>Anlık Fiyat</th>
+              <th>Durum</th>
+              <th>Gerçekleşme Zamanı</th>
+              <th>Not</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        İpucu: Bu sürüm Supabase ile ortak veri tutar. Geçerli sembol örneği: <strong>BTCTRY</strong>, <strong>ETHTRY</strong>. Kendi kısa kodunla işlem yapmak istiyorsan Coin alanına onu yaz, Sembol alanına ise Binance TR karşılığını yaz.
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = 'https://fudbbptkbobqeiupbbvi.supabase.co';
+    const supabaseKey = 'sb_publishable_40wKyJ7lRbbu97G6SYqOog_zD7ZVzUM';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const REFRESH_STORAGE_KEY = 'hedefTakipRefreshSeconds';
+    let rows = [];
+    let refreshTimer = null;
+    let isLoading = false;
+
+    const entryForm = document.getElementById('entryForm');
+    const tableBody = document.getElementById('tableBody');
+    const totalCount = document.getElementById('totalCount');
+    const waitingCount = document.getElementById('waitingCount');
+    const downCount = document.getElementById('downCount');
+    const upCount = document.getElementById('upCount');
+    const lastRefreshText = document.getElementById('lastRefreshText');
+    const refreshAllBtn = document.getElementById('refreshAllBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const autoRefreshSeconds = document.getElementById('autoRefreshSeconds');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const searchInfo = document.getElementById('searchInfo');
+    const statusBanner = document.getElementById('statusBanner');
+
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+
+    entryForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const coin = document.getElementById('coin').value.trim().toUpperCase();
+      const symbol = normalizeSymbol(document.getElementById('symbol').value.trim());
+      const date = document.getElementById('date').value;
+      const downTarget = parseNullableNumber(document.getElementById('downTarget').value);
+      const upTarget = parseNullableNumber(document.getElementById('upTarget').value);
+      const note = document.getElementById('note').value.trim();
+
+      if (!coin || !symbol || !date) {
+        alert('Coin, sembol ve tarih gerekli.');
+        return;
+      }
+      if (downTarget == null && upTarget == null) {
+        alert('En az bir hedef girmen gerekiyor.');
+        return;
+      }
+
+      const row = {
+        coin,
+        symbol,
+        date,
+        lower_target: downTarget,
+        upper_target: upTarget,
+        note,
+        status: 'waiting'
+      };
+
+      setBanner('Kayıt ekleniyor...', false);
+      const { error } = await supabase.from('targets').insert([row]);
+      if (error) {
+        console.error(error);
+        setBanner('Kayıt eklenemedi: ' + error.message, true);
+        alert('Kayıt eklenemedi: ' + error.message);
+        return;
+      }
+
+      entryForm.reset();
+      document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+      autoRefreshSeconds.value = getSavedRefreshSeconds();
+      await loadRowsFromSupabase();
+      const newest = rows[0];
+      if (newest) {
+        await refreshOne(newest.id, false);
+      }
+      setupAutoRefresh();
+      setBanner('Kayıt eklendi.', false);
+    });
+
+    refreshAllBtn.addEventListener('click', refreshAll);
+
+    clearBtn.addEventListener('click', async () => {
+      if (!rows.length) return;
+      if (!confirm('Tüm kayıtlar silinsin mi? Bu işlem geri alınmaz.')) return;
+
+      setBanner('Tüm kayıtlar siliniyor...', false);
+      const ids = rows.map((r) => r.id);
+      const { error } = await supabase.from('targets').delete().in('id', ids);
+      if (error) {
+        console.error(error);
+        setBanner('Silme işlemi başarısız: ' + error.message, true);
+        alert('Silme işlemi başarısız: ' + error.message);
+        return;
+      }
+
+      rows = [];
+      render();
+      setBanner('Tüm kayıtlar silindi.', false);
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const exportRows = rows.map((row) => ({
+        id: row.id,
+        coin: row.coin,
+        symbol: row.symbol,
+        date: row.date,
+        downTarget: row.downTarget,
+        upTarget: row.upTarget,
+        note: row.note,
+        price: row.price,
+        status: row.status,
+        statusText: row.statusText,
+        hitTime: row.hitTime,
+        updatedAt: row.updatedAt,
+        error: row.error
+      }));
+      const blob = new Blob([JSON.stringify(exportRows, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'hedef-takip-yedek.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    importBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data)) throw new Error('Geçersiz dosya');
+
+        const preparedRows = data.map((item) => ({
+          coin: String(item.coin || '').trim().toUpperCase(),
+          symbol: normalizeSymbol(String(item.symbol || '').trim()),
+          date: item.date || new Date().toISOString().slice(0, 10),
+          lower_target: parseNullableNumber(item.downTarget ?? item.lower_target),
+          upper_target: parseNullableNumber(item.upTarget ?? item.upper_target),
+          note: String(item.note || '').trim(),
+          status: 'waiting'
+        })).filter((item) => item.coin && item.symbol && item.date && (item.lower_target != null || item.upper_target != null));
+
+        if (!preparedRows.length) {
+          throw new Error('Dosyada aktarılacak geçerli kayıt bulunamadı');
+        }
+
+        setBanner('JSON kayıtları içe aktarılıyor...', false);
+        const { error } = await supabase.from('targets').insert(preparedRows);
+        if (error) {
+          throw error;
+        }
+        await loadRowsFromSupabase();
+        setBanner(preparedRows.length + ' kayıt içe aktarıldı.', false);
+      } catch (err) {
+        console.error(err);
+        alert('JSON yüklenemedi: ' + err.message);
+        setBanner('JSON yüklenemedi: ' + err.message, true);
+      } finally {
+        importFile.value = '';
+      }
+    });
+
+    autoRefreshSeconds.addEventListener('change', () => {
+      localStorage.setItem(REFRESH_STORAGE_KEY, autoRefreshSeconds.value);
+      setupAutoRefresh();
+    });
+
+    searchInput.addEventListener('input', render);
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      render();
+      searchInput.focus();
+    });
+
+    function setBanner(message, isError) {
+      statusBanner.textContent = message;
+      statusBanner.style.background = isError ? 'rgba(220, 38, 38, .12)' : 'rgba(37, 99, 235, .12)';
+      statusBanner.style.color = isError ? '#fecaca' : '#bfdbfe';
+      statusBanner.style.borderColor = isError ? 'rgba(220, 38, 38, .4)' : 'var(--border)';
+    }
+
+    function parseNullableNumber(value) {
+      const v = String(value ?? '').trim();
+      if (!v) return null;
+      const num = Number(v.replace(',', '.'));
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function normalizeSymbol(s) {
+      return s.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    }
+
+    function getSavedRefreshSeconds() {
+      return localStorage.getItem(REFRESH_STORAGE_KEY) || '10';
+    }
+
+    function formatPrice(value) {
+      if (value == null || value === '') return '-';
+      const n = Number(value);
+      if (!Number.isFinite(n)) return '-';
+      return new Intl.NumberFormat('tr-TR', {
+        minimumFractionDigits: n < 1 ? 4 : 2,
+        maximumFractionDigits: n < 1 ? 8 : 6
+      }).format(n);
+    }
+
+    function formatDateTime(value) {
+      if (!value) return '-';
+      const d = new Date(value);
+      return isNaN(d) ? '-' : d.toLocaleString('tr-TR');
+    }
+
+    function evaluateRow(row) {
+      row.error = row.error || '';
+      if (row.price == null || !Number.isFinite(Number(row.price))) {
+        row.status = row.error ? 'error' : 'waiting';
+        row.statusText = row.error ? 'Fiyat alınamadı' : 'Bekliyor';
+        return row;
+      }
+
+      const price = Number(row.price);
+      const hasDown = row.downTarget != null && Number.isFinite(Number(row.downTarget));
+      const hasUp = row.upTarget != null && Number.isFinite(Number(row.upTarget));
+
+      if (hasDown && price <= Number(row.downTarget)) {
+        row.status = 'done-down';
+        row.statusText = 'Aşağı hedef gerçekleşti';
+        row.hitTime = row.hitTime || new Date().toISOString();
+        return row;
+      }
+      if (hasUp && price >= Number(row.upTarget)) {
+        row.status = 'done-up';
+        row.statusText = 'Yukarı hedef gerçekleşti';
+        row.hitTime = row.hitTime || new Date().toISOString();
+        return row;
+      }
+
+      row.status = 'waiting';
+      row.statusText = 'Bekliyor';
+      row.hitTime = '';
+      return row;
+    }
+
+    async function fetchPrice(symbol) {
+      const url = `https://api.binance.me/api/v3/ticker/price?symbol=${encodeURIComponent(symbol)}`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const price = Number(data.price);
+      if (!Number.isFinite(price)) throw new Error('Geçersiz fiyat');
+      return price;
+    }
+
+    async function loadRowsFromSupabase() {
+      isLoading = true;
+      setBanner('Kayıtlar yükleniyor...', false);
+
+      const { data, error } = await supabase
+        .from('targets')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      isLoading = false;
+
+      if (error) {
+        console.error(error);
+        setBanner('Veriler yüklenemedi: ' + error.message, true);
+        rows = [];
+        render();
+        return;
+      }
+
+      rows = (data || []).map((row) => normalizeSupabaseRow(row));
+      render();
+      setBanner('Bağlantı başarılı. Ortak kayıtlar yüklendi.', false);
+    }
+
+    function normalizeSupabaseRow(row) {
+      const normalized = {
+        id: row.id,
+        coin: row.coin || '',
+        symbol: row.symbol || '',
+        date: row.date || '',
+        downTarget: parseNullableNumber(row.lower_target),
+        upTarget: parseNullableNumber(row.upper_target),
+        note: row.note || '',
+        price: null,
+        status: row.status || 'waiting',
+        statusText: 'Bekliyor',
+        hitTime: '',
+        updatedAt: row.created_at || '',
+        error: ''
+      };
+      return evaluateRow(normalized);
+    }
+
+    async function refreshOne(id, reloadAfter = true) {
+      const row = rows.find((r) => r.id === id);
+      if (!row) return;
+
+      try {
+        row.error = '';
+        row.price = await fetchPrice(row.symbol);
+        row.updatedAt = new Date().toISOString();
+        evaluateRow(row);
+      } catch (err) {
+        row.error = err.message || 'Hata';
+        row.updatedAt = new Date().toISOString();
+        evaluateRow(row);
+      }
+
+      render();
+      if (reloadAfter) {
+        setBanner('Fiyat güncellendi.', false);
+      }
+    }
+
+    async function refreshAll() {
+      if (!rows.length) return;
+      setBanner('Fiyatlar güncelleniyor...', false);
+
+      await Promise.all(rows.map(async (row) => {
+        try {
+          row.error = '';
+          row.price = await fetchPrice(row.symbol);
+          row.updatedAt = new Date().toISOString();
+          evaluateRow(row);
+        } catch (err) {
+          row.error = err.message || 'Hata';
+          row.updatedAt = new Date().toISOString();
+          evaluateRow(row);
+        }
+      }));
+
+      render();
+      lastRefreshText.textContent = 'Son güncelleme: ' + new Date().toLocaleString('tr-TR');
+      setBanner('Tüm fiyatlar güncellendi.', false);
+    }
+
+    async function removeRow(id) {
+      const { error } = await supabase.from('targets').delete().eq('id', id);
+      if (error) {
+        console.error(error);
+        setBanner('Kayıt silinemedi: ' + error.message, true);
+        alert('Kayıt silinemedi: ' + error.message);
+        return;
+      }
+      rows = rows.filter((r) => r.id !== id);
+      render();
+      setBanner('Kayıt silindi.', false);
+    }
+
+    async function duplicateRow(id) {
+      const row = rows.find((r) => r.id === id);
+      if (!row) return;
+
+      const copy = {
+        coin: row.coin,
+        symbol: row.symbol,
+        date: row.date,
+        lower_target: row.downTarget,
+        upper_target: row.upTarget,
+        note: row.note,
+        status: 'waiting'
+      };
+
+      const { error } = await supabase.from('targets').insert([copy]);
+      if (error) {
+        console.error(error);
+        setBanner('Kopyalama başarısız: ' + error.message, true);
+        alert('Kopyalama başarısız: ' + error.message);
+        return;
+      }
+
+      await loadRowsFromSupabase();
+      setBanner('Kayıt kopyalandı.', false);
+    }
+
+    function matchesSearch(row, term) {
+      if (!term) return true;
+      const haystack = [
+        row.coin,
+        row.symbol,
+        row.date,
+        row.note,
+        row.statusText,
+        row.error,
+        row.downTarget,
+        row.upTarget
+      ]
+        .filter((v) => v != null)
+        .join(' ')
+        .toLocaleLowerCase('tr-TR');
+      return haystack.includes(term);
+    }
+
+    function render() {
+      tableBody.innerHTML = '';
+      let waiting = 0, down = 0, up = 0;
+      const term = (searchInput.value || '').trim().toLocaleLowerCase('tr-TR');
+      const filteredRows = rows.filter((row) => matchesSearch(row, term));
+
+      for (const row of rows) {
+        if (row.status === 'done-down') down++;
+        else if (row.status === 'done-up') up++;
+        else waiting++;
+      }
+
+      for (const row of filteredRows) {
+        const tr = document.createElement('tr');
+        if (row.status === 'done-down') tr.classList.add('row-down');
+        if (row.status === 'done-up') tr.classList.add('row-up');
+
+        const statusClass = row.status === 'done-up'
+          ? 'done-up'
+          : row.status === 'done-down'
+            ? 'done-down'
+            : row.status === 'error'
+              ? 'error'
+              : 'waiting';
+
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
+          <td>${escapeHtml(row.symbol || '')}</td>
+          <td>${escapeHtml(row.date || '')}</td>
+          <td class="target-down">${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
+          <td class="target-up">${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
+          <td>
+            <div><strong>${formatPrice(row.price)}</strong></div>
+            <div class="small muted">${row.updatedAt ? formatDateTime(row.updatedAt) : '-'}</div>
+          </td>
+          <td>
+            <span class="status ${statusClass}">${escapeHtml(row.statusText || '')}</span>
+            ${row.error ? `<div class="small muted" style="margin-top:6px">${escapeHtml(row.error)}</div>` : ''}
+          </td>
+          <td>${formatDateTime(row.hitTime)}</td>
+          <td>${escapeHtml(row.note || '-')}</td>
+          <td>
+            <div class="cell-actions">
+              <button class="btn-success" data-action="refresh" data-id="${row.id}">Yenile</button>
+              <button class="btn-secondary" data-action="duplicate" data-id="${row.id}">Kopyala</button>
+              <button class="btn-danger" data-action="delete" data-id="${row.id}">Sil</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      }
+
+      totalCount.textContent = String(rows.length);
+      waitingCount.textContent = String(waiting);
+      downCount.textContent = String(down);
+      upCount.textContent = String(up);
+
+      if (!rows.length) {
+        searchInfo.textContent = isLoading ? 'Kayıtlar yükleniyor...' : 'Kayıt yok';
+      } else if (!term) {
+        searchInfo.textContent = 'Tüm kayıtlar gösteriliyor';
+      } else {
+        searchInfo.textContent = `${filteredRows.length} / ${rows.length} kayıt gösteriliyor`;
+      }
+
+      if (!filteredRows.length) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td colspan="10" class="muted" style="text-align:center; padding:18px 10px;">
+            ${isLoading ? 'Kayıtlar yükleniyor...' : 'Aramana uygun kayıt bulunamadı.'}
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      }
+    }
+
+    tableBody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if (action === 'delete') await removeRow(id);
+      if (action === 'duplicate') await duplicateRow(id);
+      if (action === 'refresh') await refreshOne(id);
+    });
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function setupAutoRefresh() {
+      const seconds = Number(getSavedRefreshSeconds());
+      autoRefreshSeconds.value = String(seconds);
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+      if (seconds > 0) {
+        refreshTimer = setInterval(refreshAll, seconds * 1000);
+      }
+    }
+
+    async function init() {
+      autoRefreshSeconds.value = getSavedRefreshSeconds();
+      render();
+      setupAutoRefresh();
+      await loadRowsFromSupabase();
+      if (rows.length) {
+        await refreshAll();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
