@@ -323,7 +323,7 @@
   <script>
     const supabaseUrl = 'https://fudbbptkbobqeiupbbvi.supabase.co';
     const supabaseKey = 'sb_publishable_40wKyJ7lRbbu97G6SYqOog_zD7ZVzUM';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const REFRESH_STORAGE_KEY = 'hedefTakipRefreshSeconds';
     let rows = [];
@@ -380,7 +380,7 @@
       };
 
       setBanner('Kayıt ekleniyor...', false);
-      const { error } = await supabase.from('targets').insert([row]);
+      const { error } = await supabaseClient.from('targets').insert([row]);
       if (error) {
         console.error(error);
         setBanner('Kayıt eklenemedi: ' + error.message, true);
@@ -408,7 +408,7 @@
 
       setBanner('Tüm kayıtlar siliniyor...', false);
       const ids = rows.map((r) => r.id);
-      const { error } = await supabase.from('targets').delete().in('id', ids);
+      const { error } = await supabaseClient.from('targets').delete().in('id', ids);
       if (error) {
         console.error(error);
         setBanner('Silme işlemi başarısız: ' + error.message, true);
@@ -470,7 +470,7 @@
         }
 
         setBanner('JSON kayıtları içe aktarılıyor...', false);
-        const { error } = await supabase.from('targets').insert(preparedRows);
+        const { error } = await supabaseClient.from('targets').insert(preparedRows);
         if (error) {
           throw error;
         }
@@ -580,7 +580,7 @@
       isLoading = true;
       setBanner('Kayıtlar yükleniyor...', false);
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('targets')
         .select('*')
         .order('created_at', { ascending: false });
@@ -663,7 +663,7 @@
     }
 
     async function removeRow(id) {
-      const { error } = await supabase.from('targets').delete().eq('id', id);
+      const { error } = await supabaseClient.from('targets').delete().eq('id', id);
       if (error) {
         console.error(error);
         setBanner('Kayıt silinemedi: ' + error.message, true);
@@ -689,7 +689,7 @@
         status: 'waiting'
       };
 
-      const { error } = await supabase.from('targets').insert([copy]);
+      const { error } = await supabaseClient.from('targets').insert([copy]);
       if (error) {
         console.error(error);
         setBanner('Kopyalama başarısız: ' + error.message, true);
