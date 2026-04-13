@@ -240,6 +240,9 @@
       color: #4ade80;
       border: 1px solid rgba(22, 163, 74, 0.35);
     }
+    .editing {
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.45);
+    }
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -254,7 +257,6 @@
 <body>
   <div class="wrap">
 
-    <!-- GECMIS USTTE -->
     <div class="card">
       <div class="section-head">
         <h2>Geçmiş Kayıtlar</h2>
@@ -292,11 +294,10 @@
       </div>
     </div>
 
-    <!-- AKTIF KAYITLAR ALTTA -->
     <div class="card">
       <h1>Hedef Takip - Binance TR</h1>
       <div class="sub">
-        Veriler Supabase üzerinde ortak tutulur. Hedef gerçekleşince aktif kayıt silinmez, üstteki geçmiş tablosuna yeni satır eklenir. Aynı hedef yeniden tetiklenirse tekrar geçmiş kaydı oluşur.
+        Veriler Supabase üzerinde ortak tutulur. Kayıt eklerken ve düzenlerken sembol doğrulanır. Hedef gerçekleşince aktif kayıt silinmez, üstteki geçmiş tablosuna yeni satır eklenir.
       </div>
 
       <div class="info-bar" id="connectionStatus">Bağlantı hazırlanıyor...</div>
@@ -340,7 +341,8 @@
         </div>
 
         <div class="actions">
-          <button type="submit" class="btn-primary">Kaydı Ekle</button>
+          <button type="submit" id="submitBtn" class="btn-primary">Kaydı Ekle</button>
+          <button type="button" id="cancelEditBtn" class="btn-secondary" style="display:none">Düzenlemeyi İptal Et</button>
           <button type="button" id="refreshAllBtn" class="btn-success">Tüm Fiyatları Güncelle</button>
           <button type="button" id="notificationBtn" class="btn-warning">Bildirim İzni Ver</button>
           <button type="button" id="telegramTestBtn" class="btn-purple">Telegram Test</button>
@@ -400,6 +402,7 @@
     let rows = [];
     let historyRows = [];
     let refreshTimer = null;
+    let editingId = null;
 
     const entryForm = document.getElementById('entryForm');
     const tableBody = document.getElementById('tableBody');
@@ -425,8 +428,17 @@
     const connectionStatus = document.getElementById('connectionStatus');
     const notificationBtn = document.getElementById('notificationBtn');
     const telegramTestBtn = document.getElementById('telegramTestBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+    const coinInput = document.getElementById('coin');
+    const symbolInput = document.getElementById('symbol');
+    const dateInput = document.getElementById('date');
+    const downTargetInput = document.getElementById('downTarget');
+    const upTargetInput = document.getElementById('upTarget');
+    const noteInput = document.getElementById('note');
+
+    dateInput.value = new Date().toISOString().slice(0, 10);
     autoRefreshSeconds.value = localStorage.getItem('hedefTakipRefreshSeconds') || '10';
 
     function parseNullableNumber(value) {
@@ -492,27 +504,18 @@
       const url = `${SUPABASE_URL}/functions/v1/telegram-send`;
       const res = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message })
       });
 
       const text = await res.text();
-
-      if (!res.ok) {
-        throw new Error(`Telegram hata: ${res.status} - ${text}`);
-      }
-
+      if (!res.ok) throw new Error(`Telegram hata: ${res.status} - ${text}`);
       return text;
     }
 
     async function fetchPrice(symbol) {
       const url = `${SUPABASE_URL}/functions/v1/price?symbol=${encodeURIComponent(symbol)}`;
-      const res = await fetch(url, {
-        method: 'GET',
-        cache: 'no-store'
-      });
+      const res = await fetch(url, { method: 'GET', cache: 'no-store' });
 
       if (!res.ok) {
         const text = await res.text();
@@ -521,12 +524,17 @@
 
       const data = await res.json();
       const price = Number(data.price);
-
-      if (!Number.isFinite(price)) {
-        throw new Error('Geçersiz fiyat');
-      }
-
+      if (!Number.isFinite(price)) throw new Error('Geçersiz fiyat');
       return price;
+    }
+
+    async function validateSymbol(symbol) {
+      try {
+        await fetchPrice(symbol);
+        return true;
+      } catch (err) {
+        return false;
+      }
     }
 
     function getZone(row, price) {
@@ -597,6 +605,11 @@
       if (error) throw error;
     }
 
+    async function updateTargetBasicInfo(id, payload) {
+      const { error } = await sb.from('targets').update(payload).eq('id', id);
+      if (error) throw error;
+    }
+
     async function insertHistory(payload) {
       const { error } = await sb.from('target_history').insert([payload]);
       if (error) throw error;
@@ -636,6 +649,31 @@
       });
     }
 
+    function startEditing(row) {
+      editingId = row.id;
+      coinInput.value = row.coin || '';
+      symbolInput.value = row.symbol || '';
+      dateInput.value = row.date || new Date().toISOString().slice(0, 10);
+      downTargetInput.value = row.downTarget ?? '';
+      upTargetInput.value = row.upTarget ?? '';
+      noteInput.value = row.note || '';
+
+      submitBtn.textContent = 'Kaydı Güncelle';
+      cancelEditBtn.style.display = 'inline-block';
+      entryForm.classList.add('editing');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEditing() {
+      editingId = null;
+      entryForm.reset();
+      dateInput.value = new Date().toISOString().slice(0, 10);
+      autoRefreshSeconds.value = getSavedRefreshSeconds();
+      submitBtn.textContent = 'Kaydı Ekle';
+      cancelEditBtn.style.display = 'none';
+      entryForm.classList.remove('editing');
+    }
+
     function matchesSearch(row, term) {
       if (!term) return true;
       const haystack = [
@@ -646,10 +684,7 @@
         zoneToText(row.currentZone),
         row.downTarget,
         row.upTarget
-      ]
-        .filter(v => v != null)
-        .join(' ')
-        .toLocaleLowerCase('tr-TR');
+      ].filter(v => v != null).join(' ').toLocaleLowerCase('tr-TR');
 
       return haystack.includes(term);
     }
@@ -666,10 +701,7 @@
         row.price_at_trigger,
         row.note,
         row.created_at
-      ]
-        .filter(v => v != null)
-        .join(' ')
-        .toLocaleLowerCase('tr-TR');
+      ].filter(v => v != null).join(' ').toLocaleLowerCase('tr-TR');
 
       return haystack.includes(term);
     }
@@ -777,6 +809,7 @@
           <td>${escapeHtml(row.note || '-')}</td>
           <td>
             <div class="cell-actions">
+              <button class="btn-warning" data-action="edit" data-id="${row.id}">Düzenle</button>
               <button class="btn-success" data-action="refresh" data-id="${row.id}">Yenile</button>
               <button class="btn-secondary" data-action="duplicate" data-id="${row.id}">Kopyala</button>
               <button class="btn-danger" data-action="delete" data-id="${row.id}">Sil</button>
@@ -912,12 +945,12 @@
     entryForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const coin = document.getElementById('coin').value.trim().toUpperCase();
-      const symbol = normalizeSymbol(document.getElementById('symbol').value.trim());
-      const date = document.getElementById('date').value;
-      const downTarget = parseNullableNumber(document.getElementById('downTarget').value);
-      const upTarget = parseNullableNumber(document.getElementById('upTarget').value);
-      const note = document.getElementById('note').value.trim();
+      const coin = coinInput.value.trim().toUpperCase();
+      const symbol = normalizeSymbol(symbolInput.value.trim());
+      const date = dateInput.value;
+      const downTarget = parseNullableNumber(downTargetInput.value);
+      const upTarget = parseNullableNumber(upTargetInput.value);
+      const note = noteInput.value.trim();
 
       if (!coin || !symbol || !date) {
         alert('Coin, sembol ve tarih gerekli.');
@@ -929,28 +962,55 @@
         return;
       }
 
-      try {
-        await addRowToSupabase({
-          coin,
-          symbol,
-          date,
-          downTarget,
-          upTarget,
-          note
-        });
+      submitBtn.disabled = true;
+      submitBtn.textContent = editingId ? 'Kontrol ediliyor...' : 'Kontrol ediliyor...';
 
-        entryForm.reset();
-        document.getElementById('date').value = new Date().toISOString().slice(0, 10);
-        autoRefreshSeconds.value = getSavedRefreshSeconds();
+      try {
+        const isValidSymbol = await validateSymbol(symbol);
+        if (!isValidSymbol) {
+          alert('Geçersiz sembol. Örnek: BTCTRY, ETHTRY, SOLTRY');
+          return;
+        }
+
+        if (editingId) {
+          await updateTargetBasicInfo(editingId, {
+            coin,
+            symbol,
+            date,
+            lower_target: downTarget,
+            upper_target: upTarget,
+            note
+          });
+
+          cancelEditing();
+        } else {
+          await addRowToSupabase({
+            coin,
+            symbol,
+            date,
+            downTarget,
+            upTarget,
+            note
+          });
+
+          entryForm.reset();
+          dateInput.value = new Date().toISOString().slice(0, 10);
+          autoRefreshSeconds.value = getSavedRefreshSeconds();
+        }
 
         await loadRowsFromSupabase();
         renderAll();
         await refreshAll();
       } catch (err) {
         console.error(err);
-        alert('Kayıt eklenemedi: ' + (err.message || 'Bilinmeyen hata'));
+        alert('İşlem başarısız: ' + (err.message || 'Bilinmeyen hata'));
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = editingId ? 'Kaydı Güncelle' : 'Kaydı Ekle';
       }
     });
+
+    cancelEditBtn.addEventListener('click', cancelEditing);
 
     refreshAllBtn.addEventListener('click', refreshAll);
 
@@ -1015,9 +1075,13 @@
         }
 
         for (const item of data) {
+          const symbol = normalizeSymbol(String(item.symbol || '').trim());
+          const ok = await validateSymbol(symbol);
+          if (!ok) continue;
+
           await addRowToSupabase({
             coin: String(item.coin || '').trim().toUpperCase(),
-            symbol: normalizeSymbol(String(item.symbol || '').trim()),
+            symbol,
             date: item.date || new Date().toISOString().slice(0, 10),
             downTarget: item.lower_target ?? item.downTarget ?? null,
             upTarget: item.upper_target ?? item.upTarget ?? null,
@@ -1078,6 +1142,7 @@
       try {
         if (action === 'delete') {
           await deleteRowFromSupabase(id);
+          if (editingId === id) cancelEditing();
           await loadRowsFromSupabase();
           renderAll();
         }
@@ -1091,6 +1156,11 @@
 
         if (action === 'refresh') {
           await refreshOne(id);
+        }
+
+        if (action === 'edit') {
+          const row = rows.find(r => r.id === id);
+          if (row) startEditing(row);
         }
       } catch (err) {
         console.error(err);
