@@ -28,7 +28,7 @@
       color: var(--text);
     }
     .wrap {
-      max-width: 1250px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -161,7 +161,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1050px;
+      min-width: 1150px;
       background: rgba(15, 23, 42, 0.9);
     }
     th, td {
@@ -191,8 +191,8 @@
     .done-up { background: rgba(22, 163, 74, .2); color: #4ade80; }
     .done-down { background: rgba(220, 38, 38, .2); color: #f87171; }
     .error { background: rgba(148, 163, 184, .2); color: #cbd5e1; }
-    .row-up td.target-up { background: rgba(22, 163, 74, .22); }
-    .row-down td.target-down { background: rgba(220, 38, 38, .22); }
+    .row-up td.target-up { background: rgba(22, 163, 74, .18); }
+    .row-down td.target-down { background: rgba(220, 38, 38, .18); }
     .muted { color: var(--muted); }
     .small { font-size: 12px; }
     .cell-actions {
@@ -217,6 +217,17 @@
       align-items: center;
       flex-wrap: wrap;
     }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-green { background: var(--green); }
+    .badge-red { background: var(--red); }
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -233,7 +244,7 @@
     <div class="card">
       <h1>Hedef Takip - Binance TR</h1>
       <div class="sub">
-        Veriler artık Supabase üzerinde ortak tutulur. Aynı linki açan herkes aynı kayıtları görebilir. Hedef gerçekleşince kayıt silinmez, alttaki geçmiş tablosuna yeni satır düşer. Coin adını istediğin gibi yazabilirsin; fiyat çekmek için ayrıca geçerli Binance TR sembolü girmen gerekir.
+        Veriler Supabase üzerinde ortak tutulur. Hedef gerçekleşince aktif kayıt silinmez, alttaki geçmiş tablosuna yeni satır eklenir. Aynı hedef yeniden tetiklenirse tekrar geçmiş kaydı oluşur.
       </div>
 
       <div class="info-bar" id="connectionStatus">Bağlantı hazırlanıyor...</div>
@@ -326,10 +337,6 @@
           <tbody id="tableBody"></tbody>
         </table>
       </div>
-
-      <div class="note">
-        İpucu: Bu sürüm aktif kayıtları üstte, geçmiş tetiklenmeleri altta tutar. Aynı hedef yeniden tetiklenirse geçmişe yeni satır eklenir. Geçerli sembol örneği: <strong>BTCTRY</strong>, <strong>ETHTRY</strong>, <strong>SOLTRY</strong>.
-      </div>
     </div>
 
     <div class="card">
@@ -355,8 +362,9 @@
             <tr>
               <th>Coin</th>
               <th>Sembol</th>
-              <th>Tip</th>
-              <th>Hedef</th>
+              <th>Aşağı Hedef</th>
+              <th>Yukarı Hedef</th>
+              <th>Tetiklenen</th>
               <th>Gerçekleşen Fiyat</th>
               <th>Zaman</th>
               <th>Not</th>
@@ -487,7 +495,6 @@
 
     async function fetchPrice(symbol) {
       const url = `${SUPABASE_URL}/functions/v1/price?symbol=${encodeURIComponent(symbol)}`;
-
       const res = await fetch(url, {
         method: 'GET',
         cache: 'no-store'
@@ -644,6 +651,8 @@
         row.symbol,
         row.trigger_type,
         historyTypeText(row.trigger_type),
+        row.lower_target,
+        row.upper_target,
         row.target_value,
         row.price_at_trigger,
         row.note,
@@ -693,9 +702,7 @@
           <td>${escapeHtml(row.date || '')}</td>
           <td class="target-down">${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
           <td class="target-up">${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
-          <td>
-            <div><strong>${formatPrice(row.price)}</strong></div>
-          </td>
+          <td><strong>${formatPrice(row.price)}</strong></td>
           <td>
             <span class="status ${statusClass}">${escapeHtml(row.error ? 'Fiyat alınamadı' : zoneToText(row.currentZone))}</span>
             ${row.error ? `<div class="small muted" style="margin-top:6px">${escapeHtml(row.error)}</div>` : ''}
@@ -744,13 +751,17 @@
       const filteredRows = historyRows.filter(row => matchesHistorySearch(row, term));
 
       for (const row of filteredRows) {
-        const typeClass = row.trigger_type === 'up' ? 'done-up' : 'done-down';
+        const isDown = row.trigger_type === 'down';
+        const badgeClass = isDown ? 'badge-red' : 'badge-green';
+        const badgeText = isDown ? 'Aşağı Hedef' : 'Yukarı Hedef';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>${escapeHtml(row.coin || '')}</strong></td>
           <td>${escapeHtml(row.symbol || '')}</td>
-          <td><span class="status ${typeClass}">${escapeHtml(historyTypeText(row.trigger_type))}</span></td>
-          <td>${formatPrice(row.target_value)}</td>
+          <td>${row.lower_target == null ? '-' : formatPrice(row.lower_target)}</td>
+          <td>${row.upper_target == null ? '-' : formatPrice(row.upper_target)}</td>
+          <td><span class="badge ${badgeClass}">${badgeText}</span></td>
           <td>${formatPrice(row.price_at_trigger)}</td>
           <td>${formatDateTime(row.created_at)}</td>
           <td>${escapeHtml(row.note || '-')}</td>
@@ -774,7 +785,7 @@
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td colspan="8" class="muted" style="text-align:center; padding:18px 10px;">
+          <td colspan="9" class="muted" style="text-align:center; padding:18px 10px;">
             Aramana uygun geçmiş kayıt bulunamadı.
           </td>
         `;
@@ -807,6 +818,8 @@
             symbol: row.symbol,
             trigger_type: newZone,
             target_value: targetValue,
+            lower_target: row.downTarget,
+            upper_target: row.upTarget,
             price_at_trigger: price,
             note: row.note
           });
@@ -818,7 +831,7 @@
 
           try {
             await sendTelegram(
-              `${row.coin} hedefe ulaştı\nTür: ${newZone === 'up' ? 'Yukarı' : 'Aşağı'}\nSembol: ${row.symbol}\nHedef: ${targetValue}\nFiyat: ${price}`
+              `${row.coin} hedefe ulaştı\nTür: ${newZone === 'up' ? 'Yukarı' : 'Aşağı'}\nSembol: ${row.symbol}\nAşağı Hedef: ${row.downTarget ?? '-'}\nYukarı Hedef: ${row.upTarget ?? '-'}\nGerçekleşen Fiyat: ${price}`
             );
           } catch (telegramErr) {
             console.error('Telegram gönderilemedi:', telegramErr);
