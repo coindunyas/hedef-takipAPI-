@@ -69,6 +69,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      position: relative;
     }
     .field label {
       font-size: 13px;
@@ -243,6 +244,35 @@
     .editing {
       box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.45);
     }
+    .suggestions {
+      display: none;
+      margin-top: 6px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      max-height: 220px;
+      overflow: auto;
+      z-index: 20;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+    }
+    .suggestion-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .suggestion-item:last-child {
+      border-bottom: 0;
+    }
+    .suggestion-item:hover,
+    .suggestion-item.active {
+      background: #1f2937;
+    }
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -297,7 +327,7 @@
     <div class="card">
       <h1>Hedef Takip - Binance TR</h1>
       <div class="sub">
-        Veriler Supabase üzerinde ortak tutulur. Kayıt eklerken ve düzenlerken sembol doğrulanır. Hedef gerçekleşince aktif kayıt silinmez, üstteki geçmiş tablosuna yeni satır eklenir.
+        Veriler Supabase üzerinde ortak tutulur. Kayıt eklerken ve düzenlerken sembol doğrulanır. Sembol alanında canlı öneri vardır.
       </div>
 
       <div class="info-bar" id="connectionStatus">Bağlantı hazırlanıyor...</div>
@@ -306,11 +336,12 @@
         <div class="grid">
           <div class="field">
             <label>Coin Kodu</label>
-            <input id="coin" placeholder="Örn: THE" required />
+            <input id="coin" placeholder="Örn: ETH" required />
           </div>
           <div class="field">
             <label>Binance TR Sembolü</label>
-            <input id="symbol" placeholder="Örn: ETHTRY" required />
+            <input id="symbol" placeholder="Örn: ETHTRY" required autocomplete="off" />
+            <div id="symbolSuggestions" class="suggestions"></div>
           </div>
           <div class="field">
             <label>Tarih</label>
@@ -403,6 +434,9 @@
     let historyRows = [];
     let refreshTimer = null;
     let editingId = null;
+    let allSymbols = [];
+    let activeSuggestionIndex = -1;
+    let currentSuggestionItems = [];
 
     const entryForm = document.getElementById('entryForm');
     const tableBody = document.getElementById('tableBody');
@@ -437,6 +471,7 @@
     const downTargetInput = document.getElementById('downTarget');
     const upTargetInput = document.getElementById('upTarget');
     const noteInput = document.getElementById('note');
+    const symbolSuggestions = document.getElementById('symbolSuggestions');
 
     dateInput.value = new Date().toISOString().slice(0, 10);
     autoRefreshSeconds.value = localStorage.getItem('hedefTakipRefreshSeconds') || '10';
@@ -532,9 +567,70 @@
       try {
         await fetchPrice(symbol);
         return true;
-      } catch (err) {
+      } catch {
         return false;
       }
+    }
+
+    async function loadSymbols() {
+      const url = `${SUPABASE_URL}/functions/v1/symbols`;
+      const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Sembol listesi alınamadı: ${res.status} - ${text}`);
+      }
+
+      const data = await res.json();
+      allSymbols = Array.isArray(data.symbols) ? data.symbols : [];
+    }
+
+    function getFilteredSymbols(query) {
+      const q = query.trim().toUpperCase();
+      if (!q) return [];
+
+      return allSymbols
+        .filter(item =>
+          item.symbol.includes(q) ||
+          item.baseAsset.includes(q)
+        )
+        .slice(0, 12);
+    }
+
+    function renderSymbolSuggestions(items) {
+      currentSuggestionItems = items;
+
+      if (!items.length) {
+        symbolSuggestions.style.display = 'none';
+        symbolSuggestions.innerHTML = '';
+        activeSuggestionIndex = -1;
+        return;
+      }
+
+      symbolSuggestions.innerHTML = items.map((item, index) => `
+        <div class="suggestion-item" data-symbol="${item.symbol}" data-index="${index}">
+          <strong>${item.symbol}</strong>
+          <span style="color:#94a3b8; font-size:12px;">${item.baseAsset}/${item.quoteAsset}</span>
+        </div>
+      `).join('');
+
+      symbolSuggestions.style.display = 'block';
+      activeSuggestionIndex = -1;
+    }
+
+    function highlightSuggestion() {
+      const nodes = symbolSuggestions.querySelectorAll('.suggestion-item');
+      nodes.forEach((node, index) => {
+        node.classList.toggle('active', index === activeSuggestionIndex);
+      });
+    }
+
+    function selectSymbol(symbol) {
+      symbolInput.value = symbol;
+      symbolSuggestions.style.display = 'none';
+      symbolSuggestions.innerHTML = '';
+      activeSuggestionIndex = -1;
+      currentSuggestionItems = [];
     }
 
     function getZone(row, price) {
@@ -672,6 +768,8 @@
       submitBtn.textContent = 'Kaydı Ekle';
       cancelEditBtn.style.display = 'none';
       entryForm.classList.remove('editing');
+      symbolSuggestions.style.display = 'none';
+      symbolSuggestions.innerHTML = '';
     }
 
     function matchesSearch(row, term) {
@@ -963,12 +1061,12 @@
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = editingId ? 'Kontrol ediliyor...' : 'Kontrol ediliyor...';
+      submitBtn.textContent = 'Kontrol ediliyor...';
 
       try {
         const isValidSymbol = await validateSymbol(symbol);
         if (!isValidSymbol) {
-          alert('Geçersiz sembol. Örnek: BTCTRY, ETHTRY, SOLTRY');
+          alert('Geçersiz sembol. Listeden seç veya doğru TRY paritesini gir.');
           return;
         }
 
@@ -1132,6 +1230,59 @@
       }
     });
 
+    symbolInput.addEventListener('input', () => {
+      const items = getFilteredSymbols(symbolInput.value);
+      renderSymbolSuggestions(items);
+    });
+
+    symbolInput.addEventListener('keydown', (e) => {
+      if (!currentSuggestionItems.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestionItems.length - 1);
+        highlightSuggestion();
+      }
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+        highlightSuggestion();
+      }
+
+      if (e.key === 'Enter' && activeSuggestionIndex >= 0) {
+        e.preventDefault();
+        selectSymbol(currentSuggestionItems[activeSuggestionIndex].symbol);
+      }
+
+      if (e.key === 'Escape') {
+        symbolSuggestions.style.display = 'none';
+        activeSuggestionIndex = -1;
+      }
+    });
+
+    symbolSuggestions.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-symbol]');
+      if (!item) return;
+      selectSymbol(item.dataset.symbol);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!symbolSuggestions.contains(e.target) && e.target !== symbolInput) {
+        symbolSuggestions.style.display = 'none';
+      }
+    });
+
+    coinInput.addEventListener('blur', () => {
+      const coin = coinInput.value.trim().toUpperCase();
+      if (!coin || symbolInput.value.trim()) return;
+
+      const found = allSymbols.find(item => item.baseAsset === coin);
+      if (found) {
+        symbolInput.value = found.symbol;
+      }
+    });
+
     tableBody.addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
@@ -1194,7 +1345,8 @@
         const { error } = await sb.from('targets').select('id').limit(1);
         if (error) throw error;
 
-        connectionStatus.textContent = 'Bağlantı başarılı. Veriler ortak listeden yükleniyor.';
+        connectionStatus.textContent = 'Bağlantı başarılı. Veriler ve semboller yükleniyor.';
+        await loadSymbols();
         await loadRowsFromSupabase();
         await loadHistoryFromSupabase();
         renderAll();
