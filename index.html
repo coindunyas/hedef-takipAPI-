@@ -183,19 +183,6 @@
     .muted { color: var(--muted); }
     .small { font-size: 12px; }
 
-    .cell-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: stretch;
-    }
-
-    .cell-actions button {
-      padding: 8px 10px;
-      font-size: 12px;
-      width: 100%;
-    }
-
     .action-row td {
       padding-top: 0;
       border-top: 0;
@@ -301,6 +288,33 @@
       color: var(--muted);
       font-size: 12px;
       text-align: center;
+    }
+
+    .price-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .price-main {
+      font-weight: 700;
+    }
+
+    .price-change {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .price-up {
+      color: #4ade80;
+    }
+
+    .price-down {
+      color: #f87171;
+    }
+
+    .price-flat {
+      color: #94a3b8;
     }
 
     @media (max-width: 1100px) {
@@ -556,6 +570,20 @@
       }).format(n);
     }
 
+    function formatPercent(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return '-';
+      return `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
+    }
+
+    function percentClass(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return 'price-flat';
+      if (n > 0) return 'price-up';
+      if (n < 0) return 'price-down';
+      return 'price-flat';
+    }
+
     function formatDateTime(value) {
       if (!value) return '-';
       const d = new Date(value);
@@ -633,8 +661,14 @@
 
       const data = await res.json();
       const price = Number(data.price);
+      const priceChangePercent = Number(data.priceChangePercent);
+
       if (!Number.isFinite(price)) throw new Error('Geçersiz fiyat');
-      return price;
+
+      return {
+        price,
+        priceChangePercent: Number.isFinite(priceChangePercent) ? priceChangePercent : null
+      };
     }
 
     async function validateSymbol(symbol) {
@@ -720,7 +754,7 @@
       const { data, error } = await sb
         .from('targets')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('symbol', { ascending: true });
 
       if (error) throw error;
 
@@ -733,6 +767,7 @@
         upTarget: item.upper_target,
         note: item.note || '',
         price: item.last_price ?? null,
+        changePercent: item.change_percent ?? null,
         currentZone: item.current_zone || 'waiting',
         updatedAt: item.last_checked_at || '',
         error: ''
@@ -743,7 +778,7 @@
       const { data, error } = await sb
         .from('target_history')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('symbol', { ascending: true });
 
       if (error) throw error;
       historyRows = data || [];
@@ -835,7 +870,8 @@
         row.note,
         row.downTarget,
         row.upTarget,
-        row.price
+        row.price,
+        row.changePercent
       ].filter(v => v != null).join(' ').toLocaleLowerCase('tr-TR');
 
       return haystack.includes(term);
@@ -945,7 +981,14 @@
           <td>${escapeHtml(row.date || '')}</td>
           <td>${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
           <td>${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
-          <td><strong>${formatPrice(row.price)}</strong></td>
+          <td>
+            <div class="price-box">
+              <div class="price-main">${formatPrice(row.price)}</div>
+              <div class="price-change ${percentClass(row.changePercent)}">
+                ${formatPercent(row.changePercent)}
+              </div>
+            </div>
+          </td>
           <td>${escapeHtml(row.note || '-')}</td>
         `;
 
@@ -990,12 +1033,14 @@
     async function processRow(row) {
       try {
         row.error = '';
-        const price = await fetchPrice(row.symbol);
+        const result = await fetchPrice(row.symbol);
+        const price = result.price;
         const newZone = getZone(row, price);
         const oldZone = row.currentZone || 'waiting';
         const checkedAt = new Date().toISOString();
 
         row.price = price;
+        row.changePercent = result.priceChangePercent;
         row.updatedAt = checkedAt;
 
         if (newZone !== oldZone && newZone !== 'waiting') {
@@ -1032,6 +1077,7 @@
         await updateTargetState(row.id, {
           current_zone: newZone,
           last_price: price,
+          change_percent: row.changePercent,
           last_checked_at: checkedAt
         });
       } catch (err) {
@@ -1049,6 +1095,7 @@
       if (!row) return;
       await processRow(row);
       await loadHistoryFromSupabase();
+      await loadRowsFromSupabase();
       renderAll();
     }
 
@@ -1060,6 +1107,7 @@
       }
 
       await loadHistoryFromSupabase();
+      await loadRowsFromSupabase();
       renderAll();
     }
 
