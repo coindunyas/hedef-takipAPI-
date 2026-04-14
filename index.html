@@ -20,18 +20,22 @@
       --blue: #2563eb;
       --purple: #7c3aed;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
       color: var(--text);
     }
+
     .wrap {
-      max-width: 1280px;
+      max-width: 1450px;
       margin: 0 auto;
       padding: 16px;
     }
+
     .card {
       background: rgba(17, 24, 39, 0.95);
       border: 1px solid var(--border);
@@ -40,42 +44,35 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.25);
       margin-bottom: 16px;
     }
-    h1, h2 {
+
+    h2 {
       margin: 0 0 8px;
+      font-size: 20px;
     }
-    h1 { font-size: 24px; }
-    h2 { font-size: 20px; }
-    .sub {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
-    .info-bar {
-      margin-bottom: 14px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(37, 99, 235, 0.15);
-      color: #dbeafe;
-      font-size: 14px;
-    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 10px;
     }
+
     .field {
       display: flex;
       flex-direction: column;
       gap: 6px;
       position: relative;
     }
-    .field label {
+
+    .field label,
+    .search-box label {
       font-size: 13px;
       color: var(--muted);
     }
-    .field input, .field select {
+
+    .field input,
+    .field select,
+    .search-box input,
+    .search-box select {
       width: 100%;
       min-height: 42px;
       padding: 10px 12px;
@@ -85,12 +82,14 @@
       color: var(--text);
       outline: none;
     }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 14px;
     }
+
     button {
       border: 0;
       border-radius: 10px;
@@ -99,12 +98,14 @@
       cursor: pointer;
       color: white;
     }
+
     .btn-primary { background: var(--blue); }
     .btn-secondary { background: #475569; }
     .btn-danger { background: var(--red); }
     .btn-success { background: var(--green); }
     .btn-warning { background: var(--yellow); color: #111827; }
     .btn-purple { background: var(--purple); }
+
     .toolbar {
       margin-top: 16px;
       display: flex;
@@ -113,6 +114,7 @@
       align-items: center;
       flex-wrap: wrap;
     }
+
     .search-row {
       margin-top: 14px;
       display: flex;
@@ -120,26 +122,14 @@
       align-items: end;
       flex-wrap: wrap;
     }
+
     .search-box {
       flex: 1 1 320px;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-    .search-box label {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .search-box input, .search-box select {
-      width: 100%;
-      min-height: 42px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text);
-      outline: none;
-    }
+
     .stats {
       display: flex;
       gap: 12px;
@@ -147,24 +137,40 @@
       font-size: 14px;
       color: var(--muted);
     }
+
     .pill {
       padding: 8px 12px;
       border-radius: 999px;
       background: rgba(51,65,85,.55);
       border: 1px solid var(--border);
     }
+
+    .tables-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .tables-row .card {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
     .table-wrap {
       overflow-x: auto;
       margin-top: 16px;
       border-radius: 16px;
       border: 1px solid var(--border);
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1150px;
+      min-width: 760px;
       background: rgba(15, 23, 42, 0.9);
     }
+
     th, td {
       padding: 12px 10px;
       border-bottom: 1px solid var(--border);
@@ -172,6 +178,7 @@
       font-size: 14px;
       vertical-align: middle;
     }
+
     th {
       background: #0f172a;
       position: sticky;
@@ -179,32 +186,23 @@
       z-index: 1;
       color: #cbd5e1;
     }
+
     tr:hover td { background: rgba(30, 41, 59, .45); }
-    .status {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .waiting { background: rgba(245, 158, 11, .2); color: #fbbf24; }
-    .done-up { background: rgba(22, 163, 74, .2); color: #4ade80; }
-    .done-down { background: rgba(220, 38, 38, .2); color: #f87171; }
-    .error { background: rgba(148, 163, 184, .2); color: #cbd5e1; }
-    .row-up td.target-up { background: rgba(22, 163, 74, .18); }
-    .row-down td.target-down { background: rgba(220, 38, 38, .18); }
+
     .muted { color: var(--muted); }
     .small { font-size: 12px; }
+
     .cell-actions {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
     }
+
     .cell-actions button {
       padding: 8px 10px;
       font-size: 12px;
     }
+
     .section-head {
       display: flex;
       justify-content: space-between;
@@ -212,6 +210,7 @@
       align-items: center;
       flex-wrap: wrap;
     }
+
     .badge {
       display: inline-block;
       padding: 6px 10px;
@@ -221,8 +220,10 @@
       font-weight: 700;
       white-space: nowrap;
     }
+
     .badge-green { background: var(--green); }
     .badge-red { background: var(--red); }
+
     .target-pill {
       display: inline-block;
       padding: 6px 10px;
@@ -231,19 +232,23 @@
       font-weight: 700;
       white-space: nowrap;
     }
+
     .target-pill-down {
       background: rgba(220, 38, 38, 0.2);
       color: #f87171;
       border: 1px solid rgba(220, 38, 38, 0.35);
     }
+
     .target-pill-up {
       background: rgba(22, 163, 74, 0.2);
       color: #4ade80;
       border: 1px solid rgba(22, 163, 74, 0.35);
     }
+
     .editing {
       box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.45);
     }
+
     .suggestions {
       display: none;
       margin-top: 6px;
@@ -258,6 +263,7 @@
       right: 0;
       top: 100%;
     }
+
     .suggestion-item {
       padding: 10px 12px;
       cursor: pointer;
@@ -266,34 +272,56 @@
       justify-content: space-between;
       gap: 10px;
     }
+
     .suggestion-item:last-child {
       border-bottom: 0;
     }
+
     .suggestion-item:hover,
     .suggestion-item.active {
       background: #1f2937;
     }
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .footer-status {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
     }
+
+    @media (max-width: 1100px) {
+      .tables-row {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 560px) {
-      .grid { grid-template-columns: 1fr; }
-      h1 { font-size: 20px; }
-      .wrap { padding: 10px; }
-      .card { padding: 12px; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wrap {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
 
-    <!-- TEK GENEL ARAMA -->
     <div class="card">
       <div class="search-row" style="margin-top:0">
         <div class="search-box" style="flex:2 1 420px;">
           <label>Genel Arama</label>
-          <input id="globalSearchInput" placeholder="Coin, sembol, tarih, not veya durum ara" />
+          <input id="globalSearchInput" placeholder="Sembol, tarih, hedef, fiyat veya not ara" />
         </div>
+
         <div class="search-box" style="flex:1 1 220px;">
           <label>Filtre</label>
           <select id="globalSearchScope">
@@ -302,76 +330,49 @@
             <option value="history">Sadece Geçmiş</option>
           </select>
         </div>
+
         <button type="button" id="clearGlobalSearchBtn" class="btn-secondary">Aramayı Temizle</button>
       </div>
+
       <div class="muted small" id="globalSearchInfo" style="margin-top:10px;">
         Tüm kayıtlar gösteriliyor
       </div>
     </div>
 
     <div class="card">
-      <div class="section-head">
-        <h2>Geçmiş Kayıtlar</h2>
-        <div class="actions" style="margin-top:0">
-          <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Coin</th>
-              <th>Sembol</th>
-              <th>Aşağı Hedef</th>
-              <th>Yukarı Hedef</th>
-              <th>Tetiklenen</th>
-              <th>Gerçekleşen Fiyat</th>
-              <th>Zaman</th>
-              <th>Not</th>
-              <th>İşlem</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <h1>Hedef Takip - Binance TR</h1>
-      <div class="sub">
-        Veriler Supabase üzerinde ortak tutulur. Kayıt eklerken ve düzenlerken sembol doğrulanır. Sembol alanında canlı öneri vardır.
-      </div>
-
-      <div class="info-bar" id="connectionStatus">Bağlantı hazırlanıyor...</div>
-
       <form id="entryForm">
         <div class="grid">
           <div class="field">
             <label>Coin Kodu</label>
             <input id="coin" placeholder="Örn: ETH" required />
           </div>
+
           <div class="field">
             <label>Binance TR Sembolü</label>
             <input id="symbol" placeholder="Örn: ETHTRY" required autocomplete="off" />
             <div id="symbolSuggestions" class="suggestions"></div>
           </div>
+
           <div class="field">
             <label>Tarih</label>
             <input id="date" type="date" required />
           </div>
+
           <div class="field">
             <label>Aşağı Hedef</label>
             <input id="downTarget" type="number" step="any" placeholder="Örn: 4.00" />
           </div>
+
           <div class="field">
             <label>Yukarı Hedef</label>
             <input id="upTarget" type="number" step="any" placeholder="Örn: 4.50" />
           </div>
+
           <div class="field">
             <label>Not</label>
             <input id="note" placeholder="İsteğe bağlı" />
           </div>
+
           <div class="field">
             <label>Otomatik Yenile</label>
             <select id="autoRefreshSeconds">
@@ -396,36 +397,68 @@
           <button type="button" id="clearBtn" class="btn-danger">Tüm Aktif Kayıtları Sil</button>
         </div>
       </form>
+    </div>
 
-      <div class="toolbar">
-        <div class="stats">
-          <div class="pill">Toplam: <strong id="totalCount">0</strong></div>
-          <div class="pill">Bekliyor: <strong id="waitingCount">0</strong></div>
-          <div class="pill">Aşağı Bölge: <strong id="downCount">0</strong></div>
-          <div class="pill">Yukarı Bölge: <strong id="upCount">0</strong></div>
+    <div class="tables-row">
+      <div class="card">
+        <div class="section-head">
+          <h2>Geçmiş Kayıtlar</h2>
+          <div class="actions" style="margin-top:0">
+            <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
+          </div>
         </div>
-        <div class="muted small" id="lastRefreshText">Henüz güncellenmedi</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sembol</th>
+                <th>Aşağı Hedef</th>
+                <th>Yukarı Hedef</th>
+                <th>Tetiklenen</th>
+                <th>Gerçekleşen Fiyat</th>
+                <th>Zaman</th>
+                <th>Not</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Coin</th>
-              <th>Sembol</th>
-              <th>Tarih</th>
-              <th>Aşağı Hedef</th>
-              <th>Yukarı Hedef</th>
-              <th>Anlık Fiyat</th>
-              <th>Durum</th>
-              <th>Son Kontrol</th>
-              <th>Not</th>
-              <th>İşlem</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <div class="card">
+        <div class="section-head">
+          <h2>Aktif Kayıtlar</h2>
+          <div class="stats">
+            <div class="pill">Toplam: <strong id="totalCount">0</strong></div>
+            <div class="pill">Bekliyor: <strong id="waitingCount">0</strong></div>
+            <div class="pill">Aşağı Bölge: <strong id="downCount">0</strong></div>
+            <div class="pill">Yukarı Bölge: <strong id="upCount">0</strong></div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sembol</th>
+                <th>Tarih</th>
+                <th>Aşağı Hedef</th>
+                <th>Yukarı Hedef</th>
+                <th>Anlık Fiyat</th>
+                <th>Not</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
       </div>
+    </div>
+
+    <div class="footer-status" id="connectionStatus">
+      Bağlantı hazırlanıyor...
     </div>
   </div>
 
@@ -449,7 +482,6 @@
     const waitingCount = document.getElementById('waitingCount');
     const downCount = document.getElementById('downCount');
     const upCount = document.getElementById('upCount');
-    const lastRefreshText = document.getElementById('lastRefreshText');
     const refreshAllBtn = document.getElementById('refreshAllBtn');
     const clearBtn = document.getElementById('clearBtn');
     const clearHistoryBtn = document.getElementById('clearHistoryBtn');
@@ -672,12 +704,6 @@
       return 'waiting';
     }
 
-    function zoneToText(zone) {
-      if (zone === 'up') return 'Yukarı bölgede';
-      if (zone === 'down') return 'Aşağı bölgede';
-      return 'Bekliyor';
-    }
-
     async function loadRowsFromSupabase() {
       const { data, error } = await sb
         .from('targets')
@@ -787,7 +813,7 @@
       submitBtn.textContent = 'Kaydı Güncelle';
       cancelEditBtn.style.display = 'inline-block';
       entryForm.classList.add('editing');
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function cancelEditing() {
@@ -809,9 +835,9 @@
         row.symbol,
         row.date,
         row.note,
-        zoneToText(row.currentZone),
         row.downTarget,
-        row.upTarget
+        row.upTarget,
+        row.price
       ].filter(v => v != null).join(' ').toLocaleLowerCase('tr-TR');
 
       return haystack.includes(term);
@@ -820,7 +846,6 @@
     function matchesHistorySearch(row, term) {
       if (!term) return true;
       const haystack = [
-        row.coin,
         row.symbol,
         row.trigger_type,
         row.lower_target,
@@ -860,8 +885,7 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
-          <td>${escapeHtml(row.symbol || '')}</td>
+          <td><strong>${escapeHtml(row.symbol || '')}</strong></td>
           <td>${lowerTargetHtml}</td>
           <td>${upperTargetHtml}</td>
           <td><span class="badge ${badgeClass}">${badgeText}</span></td>
@@ -877,14 +901,10 @@
         historyTableBody.appendChild(tr);
       }
 
-      if (!historyRows.length) {
-        // no-op
-      }
-
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td colspan="9" class="muted" style="text-align:center; padding:18px 10px;">
+          <td colspan="8" class="muted" style="text-align:center; padding:18px 10px;">
             Aramana uygun geçmiş kayıt bulunamadı.
           </td>
         `;
@@ -915,31 +935,12 @@
 
       for (const row of filteredRows) {
         const tr = document.createElement('tr');
-
-        if (row.currentZone === 'down') tr.classList.add('row-down');
-        if (row.currentZone === 'up') tr.classList.add('row-up');
-
-        const statusClass =
-          row.currentZone === 'up'
-            ? 'done-up'
-            : row.currentZone === 'down'
-              ? 'done-down'
-              : row.error
-                ? 'error'
-                : 'waiting';
-
         tr.innerHTML = `
-          <td><strong>${escapeHtml(row.coin || '')}</strong></td>
-          <td>${escapeHtml(row.symbol || '')}</td>
+          <td><strong>${escapeHtml(row.symbol || '')}</strong></td>
           <td>${escapeHtml(row.date || '')}</td>
-          <td class="target-down">${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
-          <td class="target-up">${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
+          <td>${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
+          <td>${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
           <td><strong>${formatPrice(row.price)}</strong></td>
-          <td>
-            <span class="status ${statusClass}">${escapeHtml(row.error ? 'Fiyat alınamadı' : zoneToText(row.currentZone))}</span>
-            ${row.error ? `<div class="small muted" style="margin-top:6px">${escapeHtml(row.error)}</div>` : ''}
-          </td>
-          <td>${formatDateTime(row.updatedAt)}</td>
           <td>${escapeHtml(row.note || '-')}</td>
           <td>
             <div class="cell-actions">
@@ -961,7 +962,7 @@
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td colspan="10" class="muted" style="text-align:center; padding:18px 10px;">
+          <td colspan="7" class="muted" style="text-align:center; padding:18px 10px;">
             Aramana uygun aktif kayıt bulunamadı.
           </td>
         `;
@@ -1041,10 +1042,7 @@
     }
 
     async function refreshAll() {
-      if (!rows.length) {
-        lastRefreshText.textContent = 'Henüz güncellenmedi';
-        return;
-      }
+      if (!rows.length) return;
 
       for (const row of rows) {
         await processRow(row);
@@ -1052,7 +1050,6 @@
 
       await loadHistoryFromSupabase();
       renderAll();
-      lastRefreshText.textContent = 'Son güncelleme: ' + new Date().toLocaleString('tr-TR');
     }
 
     function setupAutoRefresh() {
@@ -1138,7 +1135,6 @@
     });
 
     cancelEditBtn.addEventListener('click', cancelEditing);
-
     refreshAllBtn.addEventListener('click', refreshAll);
 
     clearBtn.addEventListener('click', async () => {
