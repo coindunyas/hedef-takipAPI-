@@ -106,15 +106,6 @@
     .btn-warning { background: var(--yellow); color: #111827; }
     .btn-purple { background: var(--purple); }
 
-    .toolbar {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
     .search-row {
       margin-top: 14px;
       display: flex;
@@ -167,7 +158,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 760px;
+      min-width: 720px;
       background: rgba(15, 23, 42, 0.9);
     }
 
@@ -194,13 +185,15 @@
 
     .cell-actions {
       display: flex;
+      flex-direction: column;
       gap: 6px;
-      flex-wrap: wrap;
+      align-items: stretch;
     }
 
     .cell-actions button {
       padding: 8px 10px;
       font-size: 12px;
+      width: 100%;
     }
 
     .section-head {
@@ -326,8 +319,8 @@
           <label>Filtre</label>
           <select id="globalSearchScope">
             <option value="all" selected>Tümü</option>
-            <option value="active">Sadece Aktif</option>
-            <option value="history">Sadece Geçmiş</option>
+            <option value="active">Sadece Hedef Bekleyen</option>
+            <option value="history">Sadece Gerçekleşen</option>
           </select>
         </div>
 
@@ -402,34 +395,7 @@
     <div class="tables-row">
       <div class="card">
         <div class="section-head">
-          <h2>Geçmiş Kayıtlar</h2>
-          <div class="actions" style="margin-top:0">
-            <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Sembol</th>
-                <th>Aşağı Hedef</th>
-                <th>Yukarı Hedef</th>
-                <th>Tetiklenen</th>
-                <th>Gerçekleşen Fiyat</th>
-                <th>Zaman</th>
-                <th>Not</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-head">
-          <h2>Aktif Kayıtlar</h2>
+          <h2>Hedef Bekleyen</h2>
           <div class="stats">
             <div class="pill">Toplam: <strong id="totalCount">0</strong></div>
             <div class="pill">Bekliyor: <strong id="waitingCount">0</strong></div>
@@ -452,6 +418,33 @@
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <h2>Gerçekleşen</h2>
+          <div class="actions" style="margin-top:0">
+            <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sembol</th>
+                <th>Aşağı Hedef</th>
+                <th>Yukarı Hedef</th>
+                <th>Tetiklenen</th>
+                <th>Gerçekleşen Fiyat</th>
+                <th>Zaman</th>
+                <th>Not</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -565,15 +558,15 @@
 
       if (!term) {
         if (scope === 'all') globalSearchInfo.textContent = 'Tüm kayıtlar gösteriliyor';
-        if (scope === 'active') globalSearchInfo.textContent = 'Sadece aktif kayıtlar gösteriliyor';
-        if (scope === 'history') globalSearchInfo.textContent = 'Sadece geçmiş kayıtlar gösteriliyor';
+        if (scope === 'active') globalSearchInfo.textContent = 'Sadece hedef bekleyen gösteriliyor';
+        if (scope === 'history') globalSearchInfo.textContent = 'Sadece gerçekleşen gösteriliyor';
         return;
       }
 
       const scopeText =
         scope === 'all' ? 'tüm kayıtlarda' :
-        scope === 'active' ? 'aktif kayıtlarda' :
-        'geçmiş kayıtlarda';
+        scope === 'active' ? 'hedef bekleyenlerde' :
+        'gerçekleşenlerde';
 
       globalSearchInfo.textContent = `"${term}" için ${scopeText} filtreleniyor`;
     }
@@ -787,20 +780,6 @@
       if (error) throw error;
     }
 
-    async function duplicateRowToSupabase(id) {
-      const row = rows.find(r => r.id === id);
-      if (!row) return;
-
-      await addRowToSupabase({
-        coin: row.coin,
-        symbol: row.symbol,
-        date: row.date,
-        downTarget: row.downTarget,
-        upTarget: row.upTarget,
-        note: row.note
-      });
-    }
-
     function startEditing(row) {
       editingId = row.id;
       coinInput.value = row.coin || '';
@@ -905,7 +884,7 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td colspan="8" class="muted" style="text-align:center; padding:18px 10px;">
-            Aramana uygun geçmiş kayıt bulunamadı.
+            Aramana uygun gerçekleşen kayıt bulunamadı.
           </td>
         `;
         historyTableBody.appendChild(tr);
@@ -946,7 +925,6 @@
             <div class="cell-actions">
               <button class="btn-warning" data-action="edit" data-id="${row.id}">Düzenle</button>
               <button class="btn-success" data-action="refresh" data-id="${row.id}">Yenile</button>
-              <button class="btn-secondary" data-action="duplicate" data-id="${row.id}">Kopyala</button>
               <button class="btn-danger" data-action="delete" data-id="${row.id}">Sil</button>
             </div>
           </td>
@@ -963,7 +941,7 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td colspan="7" class="muted" style="text-align:center; padding:18px 10px;">
-            Aramana uygun aktif kayıt bulunamadı.
+            Aramana uygun hedef bekleyen kayıt bulunamadı.
           </td>
         `;
         tableBody.appendChild(tr);
@@ -972,8 +950,8 @@
 
     function renderAll() {
       updateGlobalSearchInfo();
-      renderHistory();
       renderActive();
+      renderHistory();
     }
 
     async function processRow(row) {
@@ -1151,7 +1129,7 @@
     });
 
     clearHistoryBtn.addEventListener('click', async () => {
-      if (!confirm('Tüm geçmiş kayıtlar silinsin mi?')) return;
+      if (!confirm('Tüm gerçekleşen kayıtlar silinsin mi?')) return;
 
       try {
         await clearAllHistoryFromSupabase();
@@ -1159,7 +1137,7 @@
         renderAll();
       } catch (err) {
         console.error(err);
-        alert('Geçmiş kayıtlar silinemedi: ' + (err.message || 'Bilinmeyen hata'));
+        alert('Gerçekleşen kayıtlar silinemedi: ' + (err.message || 'Bilinmeyen hata'));
       }
     });
 
@@ -1318,13 +1296,6 @@
           renderAll();
         }
 
-        if (action === 'duplicate') {
-          await duplicateRowToSupabase(id);
-          await loadRowsFromSupabase();
-          renderAll();
-          await refreshAll();
-        }
-
         if (action === 'refresh') {
           await refreshOne(id);
         }
@@ -1354,7 +1325,7 @@
         }
       } catch (err) {
         console.error(err);
-        alert('Geçmiş kaydı silinemedi: ' + (err.message || 'Bilinmeyen hata'));
+        alert('Gerçekleşen kayıt silinemedi: ' + (err.message || 'Bilinmeyen hata'));
       }
     });
 
