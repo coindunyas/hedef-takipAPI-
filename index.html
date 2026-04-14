@@ -31,7 +31,7 @@
     }
 
     .wrap {
-      max-width: 1450px;
+      max-width: 1500px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -194,6 +194,27 @@
       padding: 8px 10px;
       font-size: 12px;
       width: 100%;
+    }
+
+    .action-row td {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .action-cell {
+      padding: 8px 10px 14px;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-bar button {
+      padding: 8px 12px;
+      font-size: 12px;
+      width: auto;
     }
 
     .section-head {
@@ -414,7 +435,6 @@
                 <th>Yukarı Hedef</th>
                 <th>Anlık Fiyat</th>
                 <th>Not</th>
-                <th>İşlem</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -441,7 +461,6 @@
                 <th>Gerçekleşen Fiyat</th>
                 <th>Zaman</th>
                 <th>Not</th>
-                <th>İşlem</th>
               </tr>
             </thead>
             <tbody id="historyTableBody"></tbody>
@@ -862,8 +881,8 @@
           ? '-'
           : `<span class="target-pill target-pill-up">${formatPrice(row.upper_target)}</span>`;
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
+        const trMain = document.createElement('tr');
+        trMain.innerHTML = `
           <td><strong>${escapeHtml(row.symbol || '')}</strong></td>
           <td>${lowerTargetHtml}</td>
           <td>${upperTargetHtml}</td>
@@ -871,19 +890,26 @@
           <td>${formatPrice(row.price_at_trigger)}</td>
           <td>${formatDateTime(row.created_at)}</td>
           <td>${escapeHtml(row.note || '-')}</td>
-          <td>
-            <div class="cell-actions">
+        `;
+
+        const trActions = document.createElement('tr');
+        trActions.className = 'action-row';
+        trActions.innerHTML = `
+          <td colspan="7" class="action-cell">
+            <div class="action-bar">
               <button class="btn-danger" data-history-action="delete" data-id="${row.id}">Sil</button>
             </div>
           </td>
         `;
-        historyTableBody.appendChild(tr);
+
+        historyTableBody.appendChild(trMain);
+        historyTableBody.appendChild(trActions);
       }
 
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td colspan="8" class="muted" style="text-align:center; padding:18px 10px;">
+          <td colspan="7" class="muted" style="text-align:center; padding:18px 10px;">
             Aramana uygun gerçekleşen kayıt bulunamadı.
           </td>
         `;
@@ -913,23 +939,30 @@
       }
 
       for (const row of filteredRows) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
+        const trMain = document.createElement('tr');
+        trMain.innerHTML = `
           <td><strong>${escapeHtml(row.symbol || '')}</strong></td>
           <td>${escapeHtml(row.date || '')}</td>
           <td>${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
           <td>${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
           <td><strong>${formatPrice(row.price)}</strong></td>
           <td>${escapeHtml(row.note || '-')}</td>
-          <td>
-            <div class="cell-actions">
+        `;
+
+        const trActions = document.createElement('tr');
+        trActions.className = 'action-row';
+        trActions.innerHTML = `
+          <td colspan="6" class="action-cell">
+            <div class="action-bar">
               <button class="btn-warning" data-action="edit" data-id="${row.id}">Düzenle</button>
               <button class="btn-success" data-action="refresh" data-id="${row.id}">Yenile</button>
               <button class="btn-danger" data-action="delete" data-id="${row.id}">Sil</button>
             </div>
           </td>
         `;
-        tableBody.appendChild(tr);
+
+        tableBody.appendChild(trMain);
+        tableBody.appendChild(trActions);
       }
 
       totalCount.textContent = String(rows.length);
@@ -940,7 +973,7 @@
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td colspan="7" class="muted" style="text-align:center; padding:18px 10px;">
+          <td colspan="6" class="muted" style="text-align:center; padding:18px 10px;">
             Aramana uygun hedef bekleyen kayıt bulunamadı.
           </td>
         `;
@@ -1129,7 +1162,7 @@
     });
 
     clearHistoryBtn.addEventListener('click', async () => {
-      if (!confirm('Tüm gerçekleşen kayıtlar silinsin mi?')) return;
+      if (!confirm('Tüm geçmişi silinsin mi?')) return;
 
       try {
         await clearAllHistoryFromSupabase();
@@ -1137,7 +1170,7 @@
         renderAll();
       } catch (err) {
         console.error(err);
-        alert('Gerçekleşen kayıtlar silinemedi: ' + (err.message || 'Bilinmeyen hata'));
+        alert('Geçmiş kayıtlar silinemedi: ' + (err.message || 'Bilinmeyen hata'));
       }
     });
 
