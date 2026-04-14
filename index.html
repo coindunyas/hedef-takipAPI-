@@ -290,33 +290,6 @@
       text-align: center;
     }
 
-    .price-box {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .price-main {
-      font-weight: 700;
-    }
-
-    .price-change {
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .price-up {
-      color: #4ade80;
-    }
-
-    .price-down {
-      color: #f87171;
-    }
-
-    .price-flat {
-      color: #94a3b8;
-    }
-
     @media (max-width: 1100px) {
       .tables-row {
         flex-direction: column;
@@ -570,20 +543,6 @@
       }).format(n);
     }
 
-    function formatPercent(value) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return '-';
-      return `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
-    }
-
-    function percentClass(value) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return 'price-flat';
-      if (n > 0) return 'price-up';
-      if (n < 0) return 'price-down';
-      return 'price-flat';
-    }
-
     function formatDateTime(value) {
       if (!value) return '-';
       const d = new Date(value);
@@ -661,14 +620,12 @@
 
       const data = await res.json();
       const price = Number(data.price);
-      const priceChangePercent = Number(data.priceChangePercent);
 
-      if (!Number.isFinite(price)) throw new Error('Geçersiz fiyat');
+      if (!Number.isFinite(price)) {
+        throw new Error('Geçersiz fiyat');
+      }
 
-      return {
-        price,
-        priceChangePercent: Number.isFinite(priceChangePercent) ? priceChangePercent : null
-      };
+      return price;
     }
 
     async function validateSymbol(symbol) {
@@ -767,7 +724,6 @@
         upTarget: item.upper_target,
         note: item.note || '',
         price: item.last_price ?? null,
-        changePercent: item.change_percent ?? null,
         currentZone: item.current_zone || 'waiting',
         updatedAt: item.last_checked_at || '',
         error: ''
@@ -870,8 +826,7 @@
         row.note,
         row.downTarget,
         row.upTarget,
-        row.price,
-        row.changePercent
+        row.price
       ].filter(v => v != null).join(' ').toLocaleLowerCase('tr-TR');
 
       return haystack.includes(term);
@@ -981,14 +936,7 @@
           <td>${escapeHtml(row.date || '')}</td>
           <td>${row.downTarget == null ? '-' : formatPrice(row.downTarget)}</td>
           <td>${row.upTarget == null ? '-' : formatPrice(row.upTarget)}</td>
-          <td>
-            <div class="price-box">
-              <div class="price-main">${formatPrice(row.price)}</div>
-              <div class="price-change ${percentClass(row.changePercent)}">
-                ${formatPercent(row.changePercent)}
-              </div>
-            </div>
-          </td>
+          <td><strong>${formatPrice(row.price)}</strong></td>
           <td>${escapeHtml(row.note || '-')}</td>
         `;
 
@@ -1033,14 +981,12 @@
     async function processRow(row) {
       try {
         row.error = '';
-        const result = await fetchPrice(row.symbol);
-        const price = result.price;
+        const price = await fetchPrice(row.symbol);
         const newZone = getZone(row, price);
         const oldZone = row.currentZone || 'waiting';
         const checkedAt = new Date().toISOString();
 
         row.price = price;
-        row.changePercent = result.priceChangePercent;
         row.updatedAt = checkedAt;
 
         if (newZone !== oldZone && newZone !== 'waiting') {
@@ -1077,7 +1023,6 @@
         await updateTargetState(row.id, {
           current_zone: newZone,
           last_price: price,
-          change_percent: row.changePercent,
           last_checked_at: checkedAt
         });
       } catch (err) {
