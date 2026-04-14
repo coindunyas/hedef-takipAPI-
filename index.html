@@ -117,7 +117,7 @@
       margin-top: 14px;
       display: flex;
       gap: 10px;
-      align-items: center;
+      align-items: end;
       flex-wrap: wrap;
     }
     .search-box {
@@ -130,7 +130,7 @@
       font-size: 13px;
       color: var(--muted);
     }
-    .search-box input {
+    .search-box input, .search-box select {
       width: 100%;
       min-height: 42px;
       padding: 10px 12px;
@@ -287,21 +287,34 @@
 <body>
   <div class="wrap">
 
+    <!-- TEK GENEL ARAMA -->
+    <div class="card">
+      <div class="search-row" style="margin-top:0">
+        <div class="search-box" style="flex:2 1 420px;">
+          <label>Genel Arama</label>
+          <input id="globalSearchInput" placeholder="Coin, sembol, tarih, not veya durum ara" />
+        </div>
+        <div class="search-box" style="flex:1 1 220px;">
+          <label>Filtre</label>
+          <select id="globalSearchScope">
+            <option value="all" selected>Tümü</option>
+            <option value="active">Sadece Aktif</option>
+            <option value="history">Sadece Geçmiş</option>
+          </select>
+        </div>
+        <button type="button" id="clearGlobalSearchBtn" class="btn-secondary">Aramayı Temizle</button>
+      </div>
+      <div class="muted small" id="globalSearchInfo" style="margin-top:10px;">
+        Tüm kayıtlar gösteriliyor
+      </div>
+    </div>
+
     <div class="card">
       <div class="section-head">
         <h2>Geçmiş Kayıtlar</h2>
         <div class="actions" style="margin-top:0">
           <button type="button" id="clearHistoryBtn" class="btn-danger">Tüm Geçmişi Sil</button>
         </div>
-      </div>
-
-      <div class="search-row">
-        <div class="search-box">
-          <label>Geçmişte Ara</label>
-          <input id="historySearchInput" placeholder="Coin, sembol, tip, fiyat veya not ara" />
-        </div>
-        <button type="button" id="clearHistorySearchBtn" class="btn-secondary">Aramayı Temizle</button>
-        <div class="muted small" id="historySearchInfo">Tüm geçmiş kayıtlar gösteriliyor</div>
       </div>
 
       <div class="table-wrap">
@@ -394,15 +407,6 @@
         <div class="muted small" id="lastRefreshText">Henüz güncellenmedi</div>
       </div>
 
-      <div class="search-row">
-        <div class="search-box">
-          <label>Aktif Kayıt Ara</label>
-          <input id="searchInput" placeholder="Coin, sembol, tarih, not veya durum ara" />
-        </div>
-        <button type="button" id="clearSearchBtn" class="btn-secondary">Aramayı Temizle</button>
-        <div class="muted small" id="searchInfo">Tüm kayıtlar gösteriliyor</div>
-      </div>
-
       <div class="table-wrap">
         <table>
           <thead>
@@ -453,17 +457,16 @@
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
     const autoRefreshSeconds = document.getElementById('autoRefreshSeconds');
-    const searchInput = document.getElementById('searchInput');
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-    const searchInfo = document.getElementById('searchInfo');
-    const historySearchInput = document.getElementById('historySearchInput');
-    const clearHistorySearchBtn = document.getElementById('clearHistorySearchBtn');
-    const historySearchInfo = document.getElementById('historySearchInfo');
     const connectionStatus = document.getElementById('connectionStatus');
     const notificationBtn = document.getElementById('notificationBtn');
     const telegramTestBtn = document.getElementById('telegramTestBtn');
     const submitBtn = document.getElementById('submitBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+    const globalSearchInput = document.getElementById('globalSearchInput');
+    const globalSearchScope = document.getElementById('globalSearchScope');
+    const clearGlobalSearchBtn = document.getElementById('clearGlobalSearchBtn');
+    const globalSearchInfo = document.getElementById('globalSearchInfo');
 
     const coinInput = document.getElementById('coin');
     const symbolInput = document.getElementById('symbol');
@@ -491,6 +494,14 @@
       return localStorage.getItem('hedefTakipRefreshSeconds') || '10';
     }
 
+    function getGlobalSearchTerm() {
+      return (globalSearchInput.value || '').trim().toLocaleLowerCase('tr-TR');
+    }
+
+    function getGlobalSearchScope() {
+      return globalSearchScope.value || 'all';
+    }
+
     function formatPrice(value) {
       if (value == null || value === '') return '-';
       const n = Number(value);
@@ -514,6 +525,25 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+    }
+
+    function updateGlobalSearchInfo() {
+      const term = globalSearchInput.value.trim();
+      const scope = getGlobalSearchScope();
+
+      if (!term) {
+        if (scope === 'all') globalSearchInfo.textContent = 'Tüm kayıtlar gösteriliyor';
+        if (scope === 'active') globalSearchInfo.textContent = 'Sadece aktif kayıtlar gösteriliyor';
+        if (scope === 'history') globalSearchInfo.textContent = 'Sadece geçmiş kayıtlar gösteriliyor';
+        return;
+      }
+
+      const scopeText =
+        scope === 'all' ? 'tüm kayıtlarda' :
+        scope === 'active' ? 'aktif kayıtlarda' :
+        'geçmiş kayıtlarda';
+
+      globalSearchInfo.textContent = `"${term}" için ${scopeText} filtreleniyor`;
     }
 
     async function requestNotificationPermission() {
@@ -757,7 +787,7 @@
       submitBtn.textContent = 'Kaydı Güncelle';
       cancelEditBtn.style.display = 'inline-block';
       entryForm.classList.add('editing');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
     function cancelEditing() {
@@ -807,8 +837,13 @@
     function renderHistory() {
       historyTableBody.innerHTML = '';
 
-      const term = (historySearchInput.value || '').trim().toLocaleLowerCase('tr-TR');
-      const filteredRows = historyRows.filter(row => matchesHistorySearch(row, term));
+      const scope = getGlobalSearchScope();
+      const term = getGlobalSearchTerm();
+      const shouldFilter = scope === 'all' || scope === 'history';
+
+      const filteredRows = shouldFilter
+        ? historyRows.filter(row => matchesHistorySearch(row, term))
+        : historyRows;
 
       for (const row of filteredRows) {
         const isDown = row.trigger_type === 'down';
@@ -843,11 +878,7 @@
       }
 
       if (!historyRows.length) {
-        historySearchInfo.textContent = 'Geçmiş kayıt yok';
-      } else if (!term) {
-        historySearchInfo.textContent = 'Tüm geçmiş kayıtlar gösteriliyor';
-      } else {
-        historySearchInfo.textContent = `${filteredRows.length} / ${historyRows.length} geçmiş kayıt gösteriliyor`;
+        // no-op
       }
 
       if (!filteredRows.length) {
@@ -868,8 +899,13 @@
       let down = 0;
       let up = 0;
 
-      const term = (searchInput.value || '').trim().toLocaleLowerCase('tr-TR');
-      const filteredRows = rows.filter(row => matchesSearch(row, term));
+      const scope = getGlobalSearchScope();
+      const term = getGlobalSearchTerm();
+      const shouldFilter = scope === 'all' || scope === 'active';
+
+      const filteredRows = shouldFilter
+        ? rows.filter(row => matchesSearch(row, term))
+        : rows;
 
       for (const row of rows) {
         if (row.currentZone === 'down') down++;
@@ -922,14 +958,6 @@
       downCount.textContent = String(down);
       upCount.textContent = String(up);
 
-      if (!rows.length) {
-        searchInfo.textContent = 'Kayıt yok';
-      } else if (!term) {
-        searchInfo.textContent = 'Tüm kayıtlar gösteriliyor';
-      } else {
-        searchInfo.textContent = `${filteredRows.length} / ${rows.length} kayıt gösteriliyor`;
-      }
-
       if (!filteredRows.length) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -942,6 +970,7 @@
     }
 
     function renderAll() {
+      updateGlobalSearchInfo();
       renderHistory();
       renderActive();
     }
@@ -1203,19 +1232,14 @@
       setupAutoRefresh();
     });
 
-    searchInput.addEventListener('input', renderActive);
-    historySearchInput.addEventListener('input', renderHistory);
+    globalSearchInput.addEventListener('input', renderAll);
+    globalSearchScope.addEventListener('change', renderAll);
 
-    clearSearchBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      renderActive();
-      searchInput.focus();
-    });
-
-    clearHistorySearchBtn.addEventListener('click', () => {
-      historySearchInput.value = '';
-      renderHistory();
-      historySearchInput.focus();
+    clearGlobalSearchBtn.addEventListener('click', () => {
+      globalSearchInput.value = '';
+      globalSearchScope.value = 'all';
+      renderAll();
+      globalSearchInput.focus();
     });
 
     notificationBtn.addEventListener('click', requestNotificationPermission);
@@ -1330,7 +1354,7 @@
         if (action === 'delete') {
           await deleteHistoryRow(id);
           await loadHistoryFromSupabase();
-          renderHistory();
+          renderAll();
         }
       } catch (err) {
         console.error(err);
