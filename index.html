@@ -766,7 +766,17 @@
     }
 
     async function insertHistory(payload) {
-      const { error } = await sb.from('target_history').insert([payload]);
+      const now = new Date().toISOString();
+
+      const { error } = await sb
+        .from('target_history')
+        .upsert([{
+          ...payload,
+          updated_at: now
+        }], {
+          onConflict: 'target_id,trigger_type'
+        });
+
       if (error) throw error;
     }
 
@@ -842,6 +852,7 @@
         row.target_value,
         row.price_at_trigger,
         row.note,
+        row.updated_at,
         row.created_at
       ].filter(v => v != null).join(' ').toLocaleLowerCase('tr-TR');
 
@@ -879,7 +890,7 @@
           <td>${upperTargetHtml}</td>
           <td><span class="badge ${badgeClass}">${badgeText}</span></td>
           <td>${formatPrice(row.price_at_trigger)}</td>
-          <td>${formatDateTime(row.created_at)}</td>
+          <td>${formatDateTime(row.updated_at || row.created_at)}</td>
           <td>${escapeHtml(row.note || '-')}</td>
         `;
 
